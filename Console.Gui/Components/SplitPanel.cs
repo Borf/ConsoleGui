@@ -14,6 +14,7 @@ public class SplitPanel : Panel
     public SplitPanel(bool horizontal)
     {
         Horizontal = horizontal;
+        Margin = new Vec2 { X = 1, Y = 1 };
     }
 
     public override void Render(Context context, Vec2 parentPos)
@@ -23,7 +24,6 @@ public class SplitPanel : Panel
         foreach(var c in Components)
         {
             c.Pos = parentPos + new Vec2 { X = left, Y = 0 };
-
             var size = i < Split.Count ? Split[i] : this.Size.X - left;
             if (size == -1)
                 size = this.Size.X - left;

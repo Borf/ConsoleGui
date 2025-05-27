@@ -38,12 +38,15 @@ public class FrameBuffer
         {
             if (text[i] != '\n')
             {
-                var el = Elements[Cursor.X, Cursor.Y];
-                el.Character = text[i];
-                el.Properties = properties;
-                if(id != null)
-                    el.ObjectId = id;
-                Cursor += new Vec2() { X = 1, Y = 0 };
+                if (Cursor.X < Width && Cursor.Y < Height)
+                {
+                    var el = Elements[Cursor.X, Cursor.Y];
+                    el.Character = text[i];
+                    el.Properties = properties;
+                    if (id != null)
+                        el.ObjectId = id;
+                    Cursor += new Vec2() { X = 1, Y = 0 };
+                }
             }
             else if (text[i] == '\n')
             {

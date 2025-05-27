@@ -19,24 +19,49 @@ while(true)
         }
         Gui.NextSplit();
         {
-            if (Gui.Button("A button", true))
+            Gui.BeginTabPanel("Tabs");
+
+            if (Gui.BeginTab("Structure"))
             {
-                Debug.WriteLine("Button pressed");
+                if (Gui.Button("A button", true))
+                {
+                    Debug.WriteLine("Button pressed");
+                }
+
+                if (Gui.Button("A small button", false))
+                {
+                    Debug.WriteLine("Button pressed");
+                }
+
+                if (Gui.InputText("Position", true, ref text))
+                {
+                    Debug.WriteLine("Text Changed!");
+                }
+                if (Gui.InputText("Position", false, ref text))
+                {
+                    Debug.WriteLine("Text Changed!");
+                }
+
+
+                Gui.EndTab();
+            }
+            if (Gui.BeginTab("Browse"))
+            {
+
+                Gui.EndTab();
+            }
+            if (Gui.BeginTab("Search"))
+            {
+
+                Gui.EndTab();
             }
 
-            if (Gui.Button("A small button", false))
-            {
-                Debug.WriteLine("Button pressed");
-            }
 
-            if (Gui.InputText("Position", true, ref text))
-            {
-                Debug.WriteLine("Text Changed!");
-            }
-            if (Gui.InputText("Position", false, ref text))
-            {
-                Debug.WriteLine("Text Changed!");
-            }
+
+            Gui.EndTabPanel();
+
+
+
         }
         Gui.EndSplit();
     }

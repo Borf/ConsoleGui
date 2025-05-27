@@ -23,10 +23,10 @@ public class Panel : Component
         if(Components.Count == 1 && Components.First() is Panel)
         {
             Margin = Vec2.Zero;
-            Components[0].Size = Size - Margin * 2; //TODO: might want to do this on adding?
+            Components[0].Size = Size; //TODO: might want to do this on adding?
         }
         if(Border)
-            context.DrawCommands.Add(new DrawBorderCommand(Pos, Size, Id, DrawBorderCommand.BorderType.Double, context.Style.WindowBackground, context.Style.WindowForeground, context.Style.WindowBackground, null));
+            context.DrawCommands.Add(new DrawBorderCommand(parentPos + Pos, Size, Id, DrawBorderCommand.BorderType.Double, context.Style.WindowBackground, context.Style.WindowForeground, context.Style.WindowBackground, null));
         if (!string.IsNullOrEmpty(Title))
             context.DrawCommands.Add(new DrawTextCommand(Id, $" {Title} ", Pos + new Vec2 { X = (Size.X - Title.Length) / 2, Y = 0 }, new ElementProperties().SetBg(context.Style.WindowBackground).SetFg(context.Style.WindowForeground)));
     }
