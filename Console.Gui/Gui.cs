@@ -41,7 +41,7 @@ public static partial class Gui
 
     public static void BeginFrame()
     {
-        Context.CurrentWindow = null;
+        Context.PanelStack.Clear();
         Context.Windows.Clear();
     }
 
@@ -96,7 +96,6 @@ public static partial class Gui
             Console.BufferHeight = Console.WindowHeight;
             Console.BufferWidth = Console.WindowWidth;
         }
-        FixLayout(Console.BufferWidth, Console.BufferHeight, null);
 
 
         Context.DrawCommands.Clear();
@@ -112,7 +111,7 @@ public static partial class Gui
             c.Render(Context, offset);
             foreach(var cc in c.Components)
             {
-                renderComponent(cc, offset + c.Margin);
+                renderComponent(cc, c.Pos + offset + c.Margin);
             }
         };
 
@@ -141,16 +140,6 @@ public static partial class Gui
 
     }
 
-    private static void FixLayout(int parentWidth, int parentHeight, Component? component)
-    {
-        if (component == null)
-        {
-            foreach (var w in Context.Windows)
-            {
-                w.CalculatedSize = new Vec2 { X = parentWidth - w.Pos.X, Y = parentHeight - w.Pos.Y };
-            }
-        }
-    }
 
     public static void DestroyContext()
     {
@@ -160,25 +149,31 @@ public static partial class Gui
 
     public static void Begin(string title, WindowFlags flags = 0)
     {
-        if (Context.CurrentWindow != null)
+        if (Context.PanelStack.Count > 0)
             throw new Exception("Can't begin when there's a window open already");
 
         //TODO: check if window already exists
-        Context.CurrentWindow = new Window() { Title = title, Flags = flags, Id = title };
+        var w = new Window() { Title = title, Flags = flags, Id = title };
+
+        if(flags.HasFlag(WindowFlags.TopWindow))
+            w.Size = new Vec2 { X = Console.WindowWidth, Y = Console.WindowHeight };
+
+        Context.PanelStack.AddLast(w);
+        Context.Windows.Add(w);
     }
     public static void End()
     {
-        if(Context.CurrentWindow == null)
+        if(Context.LastPanel as Window == null)
             throw new Exception("Can't end when there's no window open");
 
-        Context.Windows.Add(Context.CurrentWindow);
-        Context.CurrentWindow = null;
+        Context.Windows.Add((Window)Context.LastPanel);
+        Context.PanelStack.RemoveLast();
     }
 
     public static void Text(string text)
     {
-        Context.CurrentWindow.Add(new Label(text, Context.CurrentWindow.Cursor));
-        Context.CurrentWindow.Cursor += new Vec2 { X = 0, Y = 1 };
+        Context.LastPanel.Add(new Label(text, Context.LastPanel.Cursor));
+        Context.LastPanel.Cursor += new Vec2 { X = 0, Y = 1 };
     }
 
     public static bool CheckBox(string label, ref bool value)
@@ -193,25 +188,47 @@ public static partial class Gui
 
     public static bool InputText(string label, bool big, ref string value)
     {
-        Context.CurrentWindow.Add(new Label(label, Context.CurrentWindow.Cursor + new Vec2 { X = 0, Y = big ? 1 : 0 }));
-        Context.CurrentWindow.Cursor += new Vec2 { X = 20, Y = 0 };
+        Context.LastPanel.Add(new Label(label, Context.LastPanel.Cursor + new Vec2 { X = 0, Y = big ? 1 : 0 }));
+        Context.LastPanel.Cursor += new Vec2 { X = 20, Y = 0 };
 
 
-        var btn = new TextInput(ref value, Context.CurrentWindow.Cursor, big) { Id = label };
-        btn.CalculatedSize = new Vec2 { X = 15, Y = btn.CalculatedSize.Y };
-        Context.CurrentWindow.Add(btn);
-        Context.CurrentWindow.Cursor = new Vec2 { X = 0, Y = Context.CurrentWindow.Cursor.Y + btn.CalculatedSize.Y };
+        var btn = new TextInput(ref value, Context.LastPanel.Cursor, big) { Id = label };
+        btn.Size = new Vec2 { X = 15, Y = btn.Size.Y };
+        Context.LastPanel.Add(btn);
+        Context.LastPanel.Cursor = new Vec2 { X = 0, Y = Context.LastPanel.Cursor.Y + btn.Size.Y };
 
         return false;
     }
     public static bool Button(string text, bool big)
     {
-        var btn = new Button(text, Context.CurrentWindow.Cursor, big) { Id = text };
-        Context.CurrentWindow.Add(btn);
-        Context.CurrentWindow.Cursor += new Vec2 { X = 0, Y = btn.CalculatedSize.Y };
+        var btn = new Button(text, Context.LastPanel.Cursor, big) { Id = text };
+        Context.LastPanel.Add(btn);
+        Context.LastPanel.Cursor += new Vec2 { X = 0, Y = btn.Size.Y };
         return false;
     }
+    public static void Split(string title, bool horizontal, int size)
+    {
+        var sp = new SplitPanel(horizontal) { Id = title };
+        Context.LastPanel.Add(sp);
+        Context.PanelStack.AddLast(sp);
+        NextSplit(size);
+    }
 
+    public static void NextSplit(int size = -1)
+    {
+        if(!(Context.LastPanel is SplitPanel))
+            Context.PanelStack.RemoveLast();
+        var p = new Panel() { Id = Context.LastPanel.Title + "#" + (Context.LastPanel.Components.Count + 1), Border = false, Margin = new Vec2 { X = 1, Y = 1 } };
+        ((SplitPanel)Context.LastPanel).Split.Add(size);
+        Context.LastPanel.Add(p);
+        Context.PanelStack.AddLast(p);
+    }
+
+    public static void EndSplit()
+    {
+        Context.PanelStack.RemoveLast();
+        Context.PanelStack.RemoveLast();
+    }
 
 
 }

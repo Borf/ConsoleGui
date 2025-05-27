@@ -13,13 +13,7 @@ public record Vec2
 
     public static Vec2 Zero = new Vec2 { X = 0, Y = 0 };
 
-    public static Vec2 operator +(Vec2 a, Vec2 b)
-    {
-        return new Vec2() { X = a.X + b.X, Y = a.Y + b.Y };
-    }
-    
-    public static Vec2 operator -(Vec2 a, Vec2 b)
-    {
-        return new Vec2() { X = a.X - b.X, Y = a.Y - b.Y };
-    }
+    public static Vec2 operator +(Vec2 a, Vec2 b) => new Vec2() { X = a.X + b.X, Y = a.Y + b.Y };
+    public static Vec2 operator -(Vec2 a, Vec2 b) => new Vec2() { X = a.X - b.X, Y = a.Y - b.Y };
+    public static Vec2 operator *(Vec2 a, int i) => new Vec2() { X = a.X * i, Y = a.Y * i };
 }

@@ -21,10 +21,10 @@ public class Button : Component
 
         if (this.border)
         {
-            CalculatedSize = new Vec2 { X = text.Length + 5, Y = 3 };
+            Size = new Vec2 { X = text.Length + 5, Y = 3 };
         }
         else
-            CalculatedSize = new Vec2 { X = text.Length + 2, Y = 1 };
+            Size = new Vec2 { X = text.Length + 2, Y = 1 };
     }
 
     public static Stopwatch sw = new();
@@ -37,7 +37,7 @@ public class Button : Component
     {
         if (border)
         {
-            context.DrawCommands.Add(new DrawBorderCommand(Pos + parentPos, CalculatedSize, Id, DrawBorderCommand.BorderType.Round, context.Style.WindowBackground, context.Style.ButtonBorder, context.Style.ButtonCenter, context.Style.ButtonShadow));
+            context.DrawCommands.Add(new DrawBorderCommand(Pos + parentPos, Size, Id, DrawBorderCommand.BorderType.Round, context.Style.WindowBackground, context.Style.ButtonBorder, context.Style.ButtonCenter, context.Style.ButtonShadow));
             context.DrawCommands.Add(new DrawTextCommand(Id, Text, Pos + parentPos + new Vec2 { X = 2, Y = 1 }, new ElementProperties().SetBg(context.Style.ButtonCenter).SetFg(context.Style.ButtonText)));
         }
         else

@@ -11,7 +11,8 @@ namespace ConGui;
 public class Context
 {
     public List<Window> Windows { get; set; } = new List<Window>();
-    public Window? CurrentWindow { get; set; }
+    public LinkedList<Panel> PanelStack { get; set; } = new();
+    public Panel LastPanel => PanelStack.Last();
 
     public Window? HoveredWindow { get; set; }
 

@@ -11,28 +11,34 @@ while(true)
 
     Gui.Begin("Main Window", WindowFlags.TopWindow);
     {
-        Gui.Text("Hello World");
-
-        Gui.Text("Second line");
-
-        if (Gui.Button("A button", true))
+        Gui.Split("Split", true, 30);
         {
-            Debug.WriteLine("Button pressed");
-        }
+            Gui.Text("Hello World");
+            Gui.Text("Second line");
 
-        if (Gui.Button("A small button", false))
-        {
-            Debug.WriteLine("Button pressed");
         }
+        Gui.NextSplit();
+        {
+            if (Gui.Button("A button", true))
+            {
+                Debug.WriteLine("Button pressed");
+            }
 
-        if (Gui.InputText("Position", true, ref text))
-        {
-            Debug.WriteLine("Text Changed!");
+            if (Gui.Button("A small button", false))
+            {
+                Debug.WriteLine("Button pressed");
+            }
+
+            if (Gui.InputText("Position", true, ref text))
+            {
+                Debug.WriteLine("Text Changed!");
+            }
+            if (Gui.InputText("Position", false, ref text))
+            {
+                Debug.WriteLine("Text Changed!");
+            }
         }
-        if (Gui.InputText("Position", false, ref text))
-        {
-            Debug.WriteLine("Text Changed!");
-        }
+        Gui.EndSplit();
     }
     Gui.End();
 

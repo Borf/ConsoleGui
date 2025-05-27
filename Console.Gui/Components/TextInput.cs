@@ -21,17 +21,17 @@ public class TextInput : Component
 
         if (this.border)
         {
-            CalculatedSize = new Vec2 { X = text.Length, Y = 3 };
+            Size = new Vec2 { X = text.Length, Y = 3 };
         }
         else
-            CalculatedSize = new Vec2 { X = text.Length, Y = 1 };
+            Size = new Vec2 { X = text.Length, Y = 1 };
     }
 
     public override void Render(Context context, Vec2 parentPos)
     {
         if (border)
         {
-            context.DrawCommands.Add(new DrawBorderCommand(Pos + parentPos, CalculatedSize, Id, DrawBorderCommand.BorderType.Round, context.Style.WindowBackground, context.Style.InputBorder, context.Style.InputCenter, null ));
+            context.DrawCommands.Add(new DrawBorderCommand(Pos + parentPos, Size, Id, DrawBorderCommand.BorderType.Round, context.Style.WindowBackground, context.Style.InputBorder, context.Style.InputCenter, null ));
             if (!string.IsNullOrEmpty(Text))
                 context.DrawCommands.Add(new DrawTextCommand(Id, Text, Pos + parentPos + new Vec2 { X = 2, Y = 1 }, new ElementProperties().SetBg(context.Style.InputCenter).SetFg(context.Style.InputText)));
         }

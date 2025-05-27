@@ -1,5 +1,4 @@
 ﻿using ConGui.DrawCommands;
-using ConGui.Sizes;
 using ConGui.Util;
 using System;
 using System.Collections.Generic;
@@ -12,8 +11,7 @@ public abstract class Component
 {
     public string Id { get; set; } = string.Empty;
     public Vec2 Pos { get; set; } = new() { X = 0, Y = 0 };
-    public Size Size { get; set; } = new();
-    public Vec2 CalculatedSize { get; set; } = new() { X = 10, Y = 10 };
+    public Vec2 Size { get; set; } = new() { X = 10, Y = 10 };
     public List<Component> Components { get; set; } = new();
 
     public Vec2 Margin { get; set; } = Vec2.Zero;
