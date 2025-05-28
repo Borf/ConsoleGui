@@ -120,24 +120,20 @@ public static partial class Gui
         {
             renderComponent(window, Vec2.Zero);
         }
-        Context.DrawCommands.Add(new DrawTextCommand("",Math.Round(FrameTimes.Count / (FrameTimes.Last.Value - FrameTimes.First.Value),1) + " FPS", new Vec2 { X = 0, Y = 0 }, new ElementProperties().SetBg(Color.Black).SetFg(Color.White)));
-
+        Context.DrawCommands.Add(new DrawTextCommand("", Math.Round(FrameTimes.Count / (FrameTimes.Last.Value - FrameTimes.First.Value), 1) + " FPS", new Vec2 { X = 0, Y = 0 }, new ElementProperties().SetBg(Color.Black).SetFg(Color.White)));
         var frameBuffer = new FrameBuffer(Console.WindowWidth, Console.WindowHeight);
         foreach (var command in Context.DrawCommands)
         {
             command.Draw(frameBuffer);
         }
 
+        var hoveredComponent = (MouseX < frameBuffer.Width && MouseY < frameBuffer.Height) ? frameBuffer.Elements[MouseX, MouseY].ObjectId : "";
+        new DrawTextCommand(null, hoveredComponent, new Vec2 { X = Console.WindowWidth - hoveredComponent.Length - 1, Y = 0 }, new ElementProperties()).Draw(frameBuffer);
+        new DrawTextCommand(null, (Environment.TickCount % 1000 < 500) ? "▓" : "░", new Vec2 { X = MouseX, Y = MouseY }, new ElementProperties()).Draw(frameBuffer);
+
+
+
         frameBuffer.Draw();
-
-        Console.SetCursorPosition(MouseX, MouseY);
-        if(Environment.TickCount % 1000 < 500)
-            Console.Write("▓");
-        else
-            Console.Write("░");
-
-
-
     }
 
 
@@ -153,7 +149,7 @@ public static partial class Gui
             throw new Exception("Can't begin when there's a window open already");
 
         //TODO: check if window already exists
-        var w = new Window() { Title = title, Flags = flags, Id = title };
+        var w = new Window() { Title = title, Flags = flags, Id = title, Parent = null };
 
         if(flags.HasFlag(WindowFlags.TopWindow))
             w.Size = new Vec2 { X = Console.WindowWidth, Y = Console.WindowHeight };
@@ -172,7 +168,7 @@ public static partial class Gui
 
     public static void Text(string text)
     {
-        Context.LastPanel.Add(new Label(text, Context.LastPanel.Cursor));
+        Context.LastPanel.Add(new Label(text, Context.LastPanel.Cursor) { Id = text, Parent = Context.LastPanel });
         Context.LastPanel.Cursor += new Vec2 { X = 0, Y = 1 };
     }
 
@@ -188,11 +184,11 @@ public static partial class Gui
 
     public static bool InputText(string label, bool big, ref string value)
     {
-        Context.LastPanel.Add(new Label(label, Context.LastPanel.Cursor + new Vec2 { X = 0, Y = big ? 1 : 0 }));
+        Context.LastPanel.Add(new Label(label, Context.LastPanel.Cursor + new Vec2 { X = 0, Y = big ? 1 : 0 }) { Id = label, Parent = Context.LastPanel });
         Context.LastPanel.Cursor += new Vec2 { X = 20, Y = 0 };
 
 
-        var btn = new TextInput(ref value, Context.LastPanel.Cursor, big) { Id = label };
+        var btn = new TextInput(ref value, Context.LastPanel.Cursor, big) { Id = label, Parent = Context.LastPanel };
         btn.Size = new Vec2 { X = 15, Y = btn.Size.Y };
         Context.LastPanel.Add(btn);
         Context.LastPanel.Cursor = new Vec2 { X = 0, Y = Context.LastPanel.Cursor.Y + btn.Size.Y };
@@ -201,14 +197,14 @@ public static partial class Gui
     }
     public static bool Button(string text, bool big)
     {
-        var btn = new Button(text, Context.LastPanel.Cursor, big) { Id = text };
+        var btn = new Button(text, Context.LastPanel.Cursor, big) { Id = text, Parent = Context.LastPanel };
         Context.LastPanel.Add(btn);
         Context.LastPanel.Cursor += new Vec2 { X = 0, Y = btn.Size.Y };
         return false;
     }
     public static void Split(string title, bool horizontal, int size)
     {
-        var sp = new SplitPanel(horizontal) { Id = title };
+        var sp = new SplitPanel(horizontal) { Id = title, Parent = Context.LastPanel };
         Context.LastPanel.Add(sp);
         Context.PanelStack.AddLast(sp);
         NextSplit(size);
@@ -218,7 +214,7 @@ public static partial class Gui
     {
         if(!(Context.LastPanel is SplitPanel))
             Context.PanelStack.RemoveLast();
-        var p = new Panel() { Id = Context.LastPanel.Title + "#" + (Context.LastPanel.Components.Count + 1), Border = false, Margin = new Vec2 { X = 1, Y = 1 } };
+        var p = new Panel() { Id = Context.LastPanel.Title + "#" + (Context.LastPanel.Components.Count + 1), Border = false, Margin = new Vec2 { X = 1, Y = 1 }, Parent = Context.LastPanel };
         ((SplitPanel)Context.LastPanel).Split.Add(size);
         Context.LastPanel.Add(p);
         Context.PanelStack.AddLast(p);

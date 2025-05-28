@@ -21,7 +21,7 @@ public class TabPanel : Panel
             context.DrawCommands.Add(new DrawTextCommand(Id, new string('─', tab.Length+2) + "┴", p + new Vec2 { X = -1, Y = 1 }, new ElementProperties().SetBg(context.Style.WindowBackground).SetFg(context.Style.WindowForeground)));
             p += new Vec2 { X = tab.Length + 3, Y = 0 }; // Move position for next tab
         }
-        context.DrawCommands.Add(new DrawTextCommand(Id, new string('─', Size.X - p.X), p + new Vec2 { X = -1, Y = 1 }, new ElementProperties().SetBg(context.Style.WindowBackground).SetFg(context.Style.WindowForeground)));
+        context.DrawCommands.Add(new DrawTextCommand(Id, new string('─', Size.X - (p.X - Pos.X - parentPos.X + 1)), p + new Vec2 { X = -1, Y = 1 }, new ElementProperties().SetBg(context.Style.WindowBackground).SetFg(context.Style.WindowForeground)));
 
 
 
