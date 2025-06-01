@@ -37,7 +37,7 @@ while(true)
                 {
                     Debug.WriteLine("Text Changed!");
                 }
-                if (Gui.InputText("Position", false, ref text))
+                if (Gui.InputText("Position 2", false, ref text))
                 {
                     Debug.WriteLine("Text Changed!");
                 }

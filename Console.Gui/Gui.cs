@@ -137,23 +137,7 @@ public static partial class Gui
     {
 
         Context.PopId(); // root
-        //TODO: assert stack is empty now
-
-        //Console.Write("\e[38;5;243m"); //bg color
-        Console.Write("\e[48;5;234m"); //bg color
-        //Console.BackgroundColor = Color.DarkBlue;
-        //Console.ForegroundColor = Color.Whi;
-        Console.CursorVisible = false;
-
-        //Action<Component, Vec2> renderComponent = (a,b) => { };
-        //renderComponent = (Component c, Vec2 offset) =>
-        //{
-        //    c.Render(Context, offset);
-        //    foreach(var cc in c.Components)
-        //    {
-        //        renderComponent(cc, c.Pos + offset + c.Margin);
-        //    }
-        //};
+        Debug.Assert(Context.Stack.Count == 0, "Stack should be empty after rendering.");
 
 
 
@@ -169,7 +153,7 @@ public static partial class Gui
 
 
 
-        new DrawTextCommand(Math.Round(FrameTimes.Count / (FrameTimes.Last.Value - FrameTimes.First.Value), 1) + " FPS", new Vec2 { X = 0, Y = 0 }, new ElementProperties().SetBg(Color.Black).SetFg(Color.White)) { Id = "" }.Draw(frameBuffer);
+        new DrawTextCommand(Math.Round(FrameTimes.Count / (FrameTimes.Last!.Value - FrameTimes.First!.Value), 1) + " FPS", new Vec2 { X = 0, Y = 0 }, new ElementProperties().SetBg(Color.Black).SetFg(Color.White)) { Id = "" }.Draw(frameBuffer);
         Context.HoveredComponent = (Context.MousePos.X < frameBuffer.Width && Context.MousePos.Y < frameBuffer.Height) ? frameBuffer.Elements[Context.MousePos.X, Context.MousePos.Y].ObjectId : "";
         string debugLine = Context.HoveredComponent + " ";
         for (int i = 0; i < 3; i++)

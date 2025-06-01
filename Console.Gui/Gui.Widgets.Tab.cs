@@ -53,8 +53,6 @@ public static partial class Gui
             state.SelectedTabId = title;
         }
 
-
-
         Context.PushId(title); // TODO; unique name!
         Context.LastStackFrame.ScreenPos = tabPane.ScreenPos + new Vec2 { X = 1, Y = 2 };
         Context.LastStackFrame.Size = new Vec2 { X = tabPane.Size.X-2, Y = tabPane.Size.Y - 2 };

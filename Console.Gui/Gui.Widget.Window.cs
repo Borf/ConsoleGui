@@ -33,7 +33,7 @@ public static partial class Gui
 
         var sf = Context.CascadedStackFrame;
         //TODO: assert sf.ScreenPos and sf.Size are set (only set for main window)
-        Context.CurrentWindow.DrawCommands.Add(new DrawBorderCommand(sf.ScreenPos!, sf.Size!, DrawBorderCommand.BorderType.Double, Context.Style.WindowBackground, Context.Style.WindowForeground, Context.Style.WindowBackground, null));
+        Context.AddDrawCommand(new DrawBorderCommand(sf.ScreenPos!, sf.Size!, DrawBorderCommand.BorderType.Double, Context.Style.WindowBackground, Context.Style.WindowForeground, Context.Style.WindowBackground, null));
         if (!string.IsNullOrEmpty(title))
             Context.CurrentWindow.DrawCommands.Add(new DrawTextCommand($" {title} ", sf.ScreenPos! + new Vec2 { X = (sf.Size!.X - title.Length) / 2, Y = 0 }, new ElementProperties().SetBg(Context.Style.WindowBackground).SetFg(Context.Style.WindowForeground)));
     }

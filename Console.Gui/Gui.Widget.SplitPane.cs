@@ -2,6 +2,7 @@
 using ConGui.Util;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,6 +16,9 @@ public static partial class Gui
         var sp = Context.CascadedStackFrame;
         Context.PushId(title);
         Context.LastStackFrame.FrameType = "splitpane";
+
+        Debug.Assert(sp.ScreenPos != null, "ScreenPos should not be null in Split.");
+        Debug.Assert(sp.Size != null, "Size should not be null in Split.");
 
         Context.LastStackFrame.ScreenPos = sp.ScreenPos + new Vec2 { X = 1, Y = 1 };
         Context.LastStackFrame.Size = sp.Size - new Vec2 { X = 2, Y = 2 };
@@ -34,7 +38,9 @@ public static partial class Gui
         var tabPane = Context.CascadedStackFrame;
         var state = Context.GetComponentState<SplitPaneState>(tabPane.Id);
 
-        if(size == -1)
+        Debug.Assert(tabPane.Size != null, "Size should not be null in NextSplit.");
+
+        if (size == -1)
             size = tabPane.Size.X - state.SplitSizes.Sum(); // Default size is the remaining space
 
         Context.PushId("Split#" + state.SplitSizes.Count);
@@ -45,10 +51,10 @@ public static partial class Gui
 
         if (Context.LastStackFrame.ScreenPos.X + size < tabPane.ScreenPos.X + tabPane.Size.X)
         {
-            Context.CurrentWindow.DrawCommands.Add(new DrawTextCommand("╦", Context.LastStackFrame.ScreenPos + new Vec2 { X = size, Y = -1 }, new ElementProperties()));
+            Context.AddDrawCommand(new DrawTextCommand("╦", Context.LastStackFrame.ScreenPos + new Vec2 { X = size, Y = -1 }, new ElementProperties()));
             for (int ii = 0; ii < tabPane.Size.Y; ii++)
-                Context.CurrentWindow.DrawCommands.Add(new DrawTextCommand("║", Context.LastStackFrame.ScreenPos + new Vec2 { X = size, Y = ii }, new ElementProperties()));
-            Context.CurrentWindow.DrawCommands.Add(new DrawTextCommand("╩", Context.LastStackFrame.ScreenPos + new Vec2 { X = size, Y = tabPane.Size.Y }, new ElementProperties()));
+                Context.AddDrawCommand(new DrawTextCommand("║", Context.LastStackFrame.ScreenPos + new Vec2 { X = size, Y = ii }, new ElementProperties()));
+            Context.AddDrawCommand(new DrawTextCommand("╩", Context.LastStackFrame.ScreenPos + new Vec2 { X = size, Y = tabPane.Size.Y }, new ElementProperties()));
         }
     }
 

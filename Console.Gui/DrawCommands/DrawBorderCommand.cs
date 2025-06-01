@@ -35,6 +35,7 @@ public class DrawBorderCommand(Vec2 pos, Vec2 size, DrawBorderCommand.BorderType
 
         if (type == BorderType.Shadow)
         {
+            Debug.Assert(shadowColor.HasValue, "Shadow color must be set for Shadow border type");
             buffer.Write(Id, "█" + new string('▀', size.X-3)+ "█", new ElementProperties().SetFg(borderColor).SetBg(insideColor));
             buffer.Write(Id, "▄", new ElementProperties().SetFg(shadowColor.Value).SetBg(bgColor));
             for (int i = 0; i < size.Y - 3; i++)
@@ -53,6 +54,7 @@ public class DrawBorderCommand(Vec2 pos, Vec2 size, DrawBorderCommand.BorderType
 
         if (type == BorderType.Sunk)
         {
+            Debug.Assert(shadowColor.HasValue, "Shadow color must be set for Sunk border type");
             buffer.Cursor = pos + new Vec2 { X = 1, Y = 0 };
             buffer.Write(Id, new string('▄', size.X-1), new ElementProperties().SetFg(borderColor).SetBg(bgColor));
             for (int i = 0; i < size.Y - 2; i++)
