@@ -9,7 +9,7 @@ while(true)
 {
     Gui.BeginFrame();
 
-    Gui.Begin("", WindowFlags.TopWindow);
+    Gui.Begin("", WindowFlags.TopWindow | WindowFlags.HasMenu);
     {
         Gui.Split("Split", true, 30);
         {

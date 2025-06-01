@@ -3,6 +3,7 @@ using ConGui.Util;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,8 +21,8 @@ public static partial class Gui
         Debug.Assert(sp.ScreenPos != null, "ScreenPos should not be null in Split.");
         Debug.Assert(sp.Size != null, "Size should not be null in Split.");
 
-        Context.LastStackFrame.ScreenPos = sp.ScreenPos + new Vec2 { X = 1, Y = 1 };
-        Context.LastStackFrame.Size = sp.Size - new Vec2 { X = 2, Y = 2 };
+        Context.LastStackFrame.ScreenPos = sp.ScreenPos + new Vec2 { X = 0, Y = 0 };
+        Context.LastStackFrame.Size = sp.Size - new Vec2 { X = 0, Y = 0 };
         var state = Context.GetComponentState<SplitPaneState>(Context.CurrentId);
         state.SplitSizes.Clear();
 
@@ -47,14 +48,19 @@ public static partial class Gui
         Context.LastStackFrame.ScreenPos = tabPane.ScreenPos + new Vec2 { X = 1 + state.SplitSizes.Sum() + state.SplitSizes.Count(), Y = 0 };
         Context.LastStackFrame.Size = new Vec2 { X = size, Y = tabPane.Size.Y - 2 };
         Context.LastStackFrame.Cursor = Vec2.Zero;
+        Context.LastStackFrame.HasBorder = tabPane.HasBorder.Value | BorderDir.RightDouble; //TODO
         state.SplitSizes.Add(size);
 
         if (Context.LastStackFrame.ScreenPos.X + size < tabPane.ScreenPos.X + tabPane.Size.X)
         {
-            Context.AddDrawCommand(new DrawTextCommand("╦", Context.LastStackFrame.ScreenPos + new Vec2 { X = size, Y = -1 }, new ElementProperties()));
-            for (int ii = 0; ii < tabPane.Size.Y; ii++)
+            for (int ii = 0; ii < tabPane.Size.Y-1; ii++)
                 Context.AddDrawCommand(new DrawTextCommand("║", Context.LastStackFrame.ScreenPos + new Vec2 { X = size, Y = ii }, new ElementProperties()));
-            Context.AddDrawCommand(new DrawTextCommand("╩", Context.LastStackFrame.ScreenPos + new Vec2 { X = size, Y = tabPane.Size.Y }, new ElementProperties()));
+
+            if (tabPane.HasBorder.Value.HasFlag(BorderDir.Up))
+                Context.AddDrawCommand(new DrawTextCommand("╦", Context.LastStackFrame.ScreenPos + new Vec2 { X = size, Y = -1 }, new ElementProperties()));
+
+            if (tabPane.HasBorder.Value.HasFlag(BorderDir.Down))
+                Context.AddDrawCommand(new DrawTextCommand("╩", Context.LastStackFrame.ScreenPos + new Vec2 { X = size, Y = tabPane.Size.Y }, new ElementProperties()));
         }
     }
 

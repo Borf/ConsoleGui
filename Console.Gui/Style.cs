@@ -16,6 +16,9 @@ public class Style
 
     public Color WindowBackground { get; set; } = Back;
     public Color WindowForeground { get; set; } = Front;
+
+    public Color MenuBackground { get; set; } = Dark;
+
     
     public Color ButtonBorder { get; set; } = Front;
     public Color ButtonCenter { get; set; } = Primary;

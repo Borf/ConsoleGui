@@ -15,5 +15,34 @@ public class StackFrame
     public Vec2? ScreenPos { get; set; } = null;
     public Vec2? Size { get; set; } = null;
 
+    public BorderDir? HasBorder { get; set; } = null;
+
     //TODO: style?
+}
+
+
+[Flags]
+public enum BorderDir
+{
+    None = 0,
+    Left = 1 << 0,
+    Right = 1 << 1,
+    Up = 1 << 2,
+    Down = 1 << 3,
+
+    LeftDouble = 1 << 4,
+    RightDouble = 1 << 5,
+    UpDouble = 1 << 6,
+    DownDouble = 1 << 7,
+
+    Double = LeftDouble | RightDouble | UpDouble | DownDouble,
+    Single = Left | Right | Up | Down,
+
+    LeftAny = Left | LeftDouble,
+    RightAny = Right | RightDouble,
+    UpAny = Up | UpDouble,
+    DownAny = Down | DownDouble,
+
+    Any = ~0,
+
 }

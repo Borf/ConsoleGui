@@ -22,6 +22,7 @@ public class Context
         Cursor = Stack.LastOrDefault(sf => sf.Cursor != null)?.Cursor,
         Size = Stack.LastOrDefault(sf => sf.Size != null)?.Size,
         ScreenPos = Stack.LastOrDefault(sf => sf.ScreenPos != null)?.ScreenPos,
+        HasBorder = Stack.LastOrDefault(sf => sf.HasBorder != null)?.HasBorder
     };
     public Window? CurrentWindow { get; set; } = null;
     public string CurrentId => string.Join("/", Stack.Select(s => s.Id));
@@ -76,3 +77,4 @@ public enum MouseState
     Pressed,
     Released,
 }
+

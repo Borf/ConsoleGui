@@ -199,4 +199,5 @@ public static partial class Gui
 public enum WindowFlags
 {
     TopWindow = 1<<0,
+    HasMenu = 1<<1,
 }
