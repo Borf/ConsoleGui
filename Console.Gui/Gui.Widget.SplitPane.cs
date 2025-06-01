@@ -1,0 +1,67 @@
+﻿using ConGui.DrawCommands;
+using ConGui.Util;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ConGui;
+
+public static partial class Gui
+{
+    public static void Split(string title, bool horizontal, int size)
+    {
+        var sp = Context.CascadedStackFrame;
+        Context.PushId(title);
+        Context.LastStackFrame.FrameType = "splitpane";
+
+        Context.LastStackFrame.ScreenPos = sp.ScreenPos + new Vec2 { X = 1, Y = 1 };
+        Context.LastStackFrame.Size = sp.Size - new Vec2 { X = 2, Y = 2 };
+        var state = Context.GetComponentState<SplitPaneState>(Context.CurrentId);
+        state.SplitSizes.Clear();
+
+        NextSplit(size);
+
+    }
+
+    public static void NextSplit(int size = -1)
+    {
+        if(Context.CascadedStackFrame.FrameType != "splitpane")
+        {
+            Context.PopId();
+        }
+        var tabPane = Context.CascadedStackFrame;
+        var state = Context.GetComponentState<SplitPaneState>(tabPane.Id);
+
+        if(size == -1)
+            size = tabPane.Size.X - state.SplitSizes.Sum(); // Default size is the remaining space
+
+        Context.PushId("Split#" + state.SplitSizes.Count);
+        Context.LastStackFrame.ScreenPos = tabPane.ScreenPos + new Vec2 { X = 1 + state.SplitSizes.Sum() + state.SplitSizes.Count(), Y = 0 };
+        Context.LastStackFrame.Size = new Vec2 { X = size, Y = tabPane.Size.Y - 2 };
+        Context.LastStackFrame.Cursor = Vec2.Zero;
+        state.SplitSizes.Add(size);
+
+        if (Context.LastStackFrame.ScreenPos.X + size < tabPane.ScreenPos.X + tabPane.Size.X)
+        {
+            Context.CurrentWindow.DrawCommands.Add(new DrawTextCommand("╦", Context.LastStackFrame.ScreenPos + new Vec2 { X = size, Y = -1 }, new ElementProperties()));
+            for (int ii = 0; ii < tabPane.Size.Y; ii++)
+                Context.CurrentWindow.DrawCommands.Add(new DrawTextCommand("║", Context.LastStackFrame.ScreenPos + new Vec2 { X = size, Y = ii }, new ElementProperties()));
+            Context.CurrentWindow.DrawCommands.Add(new DrawTextCommand("╩", Context.LastStackFrame.ScreenPos + new Vec2 { X = size, Y = tabPane.Size.Y }, new ElementProperties()));
+        }
+    }
+
+    public static void EndSplit()
+    {
+        Context.PopId();
+        Context.PopId();
+    }
+}
+
+
+class SplitPaneState : ComponentState
+{
+    public bool Horizontal { get; set; } = true;
+    public List<int> SplitSizes { get; set; } = new();
+}

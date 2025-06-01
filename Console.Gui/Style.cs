@@ -25,4 +25,6 @@ public class Style
     public Color InputCenter { get; set; } = Dark;
     public Color InputText { get; set; } = Front;
 
+    public Color TabSelected { get; set; } = Primary;
+
 }

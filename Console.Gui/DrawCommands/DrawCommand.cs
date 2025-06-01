@@ -5,7 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace ConGui.DrawCommands;
-public interface DrawCommand
+public abstract class DrawCommand
 {
-    public void Draw(FrameBuffer buffer);
+    public string Id { get; set; } = string.Empty;
+
+    public abstract void Draw(FrameBuffer buffer);
 }

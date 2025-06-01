@@ -1,5 +1,4 @@
 ﻿using ANSIConsole;
-using ConGui.Components;
 using ConGui.DrawCommands;
 using ConGui.Util;
 using System.Diagnostics;
@@ -38,18 +37,23 @@ public static partial class Gui
             );
     }
 
+    public static LinkedList<double> FrameTimes = new();
+    public static bool[] pressState = new bool[3];
+
+    public static List<List<int>> MouseEventCodes = [
+        [0, 8, 16, 24, 32, 36, 40, 48, 56],
+        [1, 9, 17, 25, 33, 37, 41, 45, 49, 53, 57, 61],
+        [2, 10, 14, 18, 22, 26, 30, 34, 42, 46, 50, 54, 58, 62]
+    ];
+    static int lastMouseEvent = 0;
+
 
     public static void BeginFrame()
     {
-        Context.PanelStack.Clear();
+        //Context.PanelStack.Clear();
         Context.Windows.Clear();
-    }
+        Context.Stack.Clear(); // should be empty
 
-    public static LinkedList<double> FrameTimes = new();
-    public static int MouseX = 0;
-    public static int MouseY = 0;
-    public static void Render()
-    {
         FrameTimes.AddLast(Environment.TickCount / 1000.0);
         while (FrameTimes.Count > 1000)
             FrameTimes.RemoveFirst();
@@ -64,20 +68,33 @@ public static partial class Gui
         while (result.Length > 1 && result[0] == '\e')
         {
             string code = result[1..];
-            if(code.Contains('\e'))
-                code = code[0..(code.IndexOf('\e')-1)];
+            if (code.Contains('\e'))
+                code = code[0..(code.IndexOf('\e') - 1)];
+            //Debug.WriteLine("Code: " + code);
 
-            if(code.StartsWith("[<"))
+            if (code.StartsWith("[<"))
             {
                 var pressed = code.EndsWith("M");
                 var released = code.EndsWith("m");
                 if (pressed || released)
                     code = code[0..^1];
 
+
                 var p = code[2..].Split(";");
-                MouseX = int.Parse(p[1])-1;
-                MouseY = int.Parse(p[2])-1;
-                //TODO: 
+                Context.MousePos = new Vec2 { X = int.Parse(p[1]) - 1, Y = int.Parse(p[2]) - 1 };
+                int mouseEvent = int.Parse(p[0]);
+
+
+                for (int i = 0; i < 3; i++)
+                    if (MouseEventCodes[i].Contains(mouseEvent) && (pressed || released))
+                    {
+                        pressState[i] = pressed ? true : false;
+                        lastMouseEvent = i;
+                    }
+
+                if (mouseEvent == 35) //windows only???
+                    pressState[lastMouseEvent] = pressed ? true : false;
+
             }
             if (result.Length > code.Length + 2)
                 result = result[(code.Length + 2)..];
@@ -86,10 +103,23 @@ public static partial class Gui
         }
 
 
-
-        
-
-
+        for (int i = 0; i < 3; i++)
+        {
+            if (pressState[i])
+            {
+                if (Context.MouseStates[i] == MouseState.Pressed)
+                    Context.MouseStates[i] = MouseState.Down;
+                else if (Context.MouseStates[i] == MouseState.Up)
+                    Context.MouseStates[i] = MouseState.Pressed;
+            }
+            else //!pressed
+            {
+                if (Context.MouseStates[i] == MouseState.Down)
+                    Context.MouseStates[i] = MouseState.Released;
+                else if (Context.MouseStates[i] == MouseState.Released)
+                    Context.MouseStates[i] = MouseState.Up;
+            }
+        }
 
         if (OperatingSystem.IsWindows())
         {
@@ -98,38 +128,57 @@ public static partial class Gui
         }
 
 
-        Context.DrawCommands.Clear();
+        Context.PushId("Root");
+    }
+
+
+
+    public static void Render()
+    {
+
+        Context.PopId(); // root
+        //TODO: assert stack is empty now
+
         //Console.Write("\e[38;5;243m"); //bg color
         Console.Write("\e[48;5;234m"); //bg color
         //Console.BackgroundColor = Color.DarkBlue;
         //Console.ForegroundColor = Color.Whi;
         Console.CursorVisible = false;
 
-        Action<Component, Vec2> renderComponent = (a,b) => { };
-        renderComponent = (Component c, Vec2 offset) =>
-        {
-            c.Render(Context, offset);
-            foreach(var cc in c.Components)
-            {
-                renderComponent(cc, c.Pos + offset + c.Margin);
-            }
-        };
+        //Action<Component, Vec2> renderComponent = (a,b) => { };
+        //renderComponent = (Component c, Vec2 offset) =>
+        //{
+        //    c.Render(Context, offset);
+        //    foreach(var cc in c.Components)
+        //    {
+        //        renderComponent(cc, c.Pos + offset + c.Margin);
+        //    }
+        //};
 
 
-        foreach(var window in Context.Windows)
-        {
-            renderComponent(window, Vec2.Zero);
-        }
-        Context.DrawCommands.Add(new DrawTextCommand("", Math.Round(FrameTimes.Count / (FrameTimes.Last.Value - FrameTimes.First.Value), 1) + " FPS", new Vec2 { X = 0, Y = 0 }, new ElementProperties().SetBg(Color.Black).SetFg(Color.White)));
+
         var frameBuffer = new FrameBuffer(Console.WindowWidth, Console.WindowHeight);
-        foreach (var command in Context.DrawCommands)
+
+        foreach (var window in Context.Windows)
         {
-            command.Draw(frameBuffer);
+            foreach(var drawCommand in window.DrawCommands)
+            {
+                drawCommand.Draw(frameBuffer);
+            }
         }
 
-        var hoveredComponent = (MouseX < frameBuffer.Width && MouseY < frameBuffer.Height) ? frameBuffer.Elements[MouseX, MouseY].ObjectId : "";
-        new DrawTextCommand(null, hoveredComponent, new Vec2 { X = Console.WindowWidth - hoveredComponent.Length - 1, Y = 0 }, new ElementProperties()).Draw(frameBuffer);
-        new DrawTextCommand(null, (Environment.TickCount % 1000 < 500) ? "▓" : "░", new Vec2 { X = MouseX, Y = MouseY }, new ElementProperties()).Draw(frameBuffer);
+
+
+        new DrawTextCommand(Math.Round(FrameTimes.Count / (FrameTimes.Last.Value - FrameTimes.First.Value), 1) + " FPS", new Vec2 { X = 0, Y = 0 }, new ElementProperties().SetBg(Color.Black).SetFg(Color.White)) { Id = "" }.Draw(frameBuffer);
+        Context.HoveredComponent = (Context.MousePos.X < frameBuffer.Width && Context.MousePos.Y < frameBuffer.Height) ? frameBuffer.Elements[Context.MousePos.X, Context.MousePos.Y].ObjectId : "";
+        string debugLine = Context.HoveredComponent + " ";
+        for (int i = 0; i < 3; i++)
+            debugLine += Context.MouseStates[i].ToString()[0];
+
+
+
+        new DrawTextCommand(debugLine, new Vec2 { X = Console.WindowWidth - debugLine.Length - 1, Y = 0 }, new ElementProperties()) { Id = "" }.Draw(frameBuffer);
+        new DrawTextCommand((Environment.TickCount % 1000 < 500) ? "▓" : "░", new Vec2 { X = Context.MousePos.X, Y = Context.MousePos.Y }, new ElementProperties()) { Id = "" }.Draw(frameBuffer);
 
 
 
@@ -143,34 +192,8 @@ public static partial class Gui
     }
 
 
-    public static void Begin(string title, WindowFlags flags = 0)
-    {
-        if (Context.PanelStack.Count > 0)
-            throw new Exception("Can't begin when there's a window open already");
 
-        //TODO: check if window already exists
-        var w = new Window() { Title = title, Flags = flags, Id = title, Parent = null };
 
-        if(flags.HasFlag(WindowFlags.TopWindow))
-            w.Size = new Vec2 { X = Console.WindowWidth, Y = Console.WindowHeight };
-
-        Context.PanelStack.AddLast(w);
-        Context.Windows.Add(w);
-    }
-    public static void End()
-    {
-        if(Context.LastPanel as Window == null)
-            throw new Exception("Can't end when there's no window open");
-
-        Context.Windows.Add((Window)Context.LastPanel);
-        Context.PanelStack.RemoveLast();
-    }
-
-    public static void Text(string text)
-    {
-        Context.LastPanel.Add(new Label(text, Context.LastPanel.Cursor) { Id = text, Parent = Context.LastPanel });
-        Context.LastPanel.Cursor += new Vec2 { X = 0, Y = 1 };
-    }
 
     public static bool CheckBox(string label, ref bool value)
     {
@@ -182,49 +205,8 @@ public static partial class Gui
 
     }
 
-    public static bool InputText(string label, bool big, ref string value)
-    {
-        Context.LastPanel.Add(new Label(label, Context.LastPanel.Cursor + new Vec2 { X = 0, Y = big ? 1 : 0 }) { Id = label, Parent = Context.LastPanel });
-        Context.LastPanel.Cursor += new Vec2 { X = 20, Y = 0 };
 
 
-        var btn = new TextInput(ref value, Context.LastPanel.Cursor, big) { Id = label, Parent = Context.LastPanel };
-        btn.Size = new Vec2 { X = 15, Y = btn.Size.Y };
-        Context.LastPanel.Add(btn);
-        Context.LastPanel.Cursor = new Vec2 { X = 0, Y = Context.LastPanel.Cursor.Y + btn.Size.Y };
-
-        return false;
-    }
-    public static bool Button(string text, bool big)
-    {
-        var btn = new Button(text, Context.LastPanel.Cursor, big) { Id = text, Parent = Context.LastPanel };
-        Context.LastPanel.Add(btn);
-        Context.LastPanel.Cursor += new Vec2 { X = 0, Y = btn.Size.Y };
-        return false;
-    }
-    public static void Split(string title, bool horizontal, int size)
-    {
-        var sp = new SplitPanel(horizontal) { Id = title, Parent = Context.LastPanel };
-        Context.LastPanel.Add(sp);
-        Context.PanelStack.AddLast(sp);
-        NextSplit(size);
-    }
-
-    public static void NextSplit(int size = -1)
-    {
-        if(!(Context.LastPanel is SplitPanel))
-            Context.PanelStack.RemoveLast();
-        var p = new Panel() { Id = Context.LastPanel.Title + "#" + (Context.LastPanel.Components.Count + 1), Border = false, Margin = new Vec2 { X = 1, Y = 1 }, Parent = Context.LastPanel };
-        ((SplitPanel)Context.LastPanel).Split.Add(size);
-        Context.LastPanel.Add(p);
-        Context.PanelStack.AddLast(p);
-    }
-
-    public static void EndSplit()
-    {
-        Context.PanelStack.RemoveLast();
-        Context.PanelStack.RemoveLast();
-    }
 
 
 }

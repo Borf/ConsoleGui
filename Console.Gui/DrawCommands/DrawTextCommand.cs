@@ -12,19 +12,17 @@ public class DrawTextCommand : DrawCommand
     private string text;
     private Vec2 pos;
     private ElementProperties properties;
-    private string? id;
 
-    public DrawTextCommand(string? id, string text, Vec2 pos, ElementProperties properties)
+    public DrawTextCommand(string text, Vec2 pos, ElementProperties properties)
     {
-        this.id = id;
         this.text = text;
         this.pos = pos;
         this.properties = properties;
     }
 
-    public void Draw(FrameBuffer buffer)
+    public override void Draw(FrameBuffer buffer)
     {
         buffer.Cursor = pos;
-        buffer.Write(id, text, properties);
+        buffer.Write(Id, text, properties);
     }
 }
