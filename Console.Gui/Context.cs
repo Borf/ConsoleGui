@@ -10,10 +10,12 @@ using System.Threading.Tasks;
 namespace ConGui;
 public class Context
 {
+    public StackFrame NextFrameProperties { get; private set; } = new() { Id = string.Empty };
+
     public List<Window> Windows { get; set; } = new();
     public List<string> WindowOrder { get; set; } = new();
-    public StackFrame LastStackFrame => CurrentWindow.Stack.Last();
-    public StackFrame CascadedStackFrame => CurrentWindow.CascadedStackFrame;
+    public StackFrame LastStackFrame => CurrentWindow?.Stack?.LastOrDefault() ?? throw new Exception("Current window not set");
+    public StackFrame CascadedStackFrame => CurrentWindow?.CascadedStackFrame ?? throw new Exception("Current window not set");
     public string CurrentId => CurrentWindow?.CurrentId ?? "";
 
 
@@ -21,12 +23,21 @@ public class Context
     public Window? CurrentWindow => WindowCreationStack.LastOrDefault();
     public void AddDrawCommand(DrawCommand drawCommand)
     {
-        drawCommand.Id = CurrentId;
+        var sf = CascadedStackFrame;
+
+        drawCommand.Id = sf.Id;
+        drawCommand.BackgroundColor = sf.BackgroundColor ?? throw new Exception("Need to have colors to draw");
+        drawCommand.ForegroundColor = sf.ForegroundColor ?? throw new Exception("Need to have colors to draw");
+        drawCommand.TextColor = sf.TextColor ?? throw new Exception("Need to have colors to draw");
         Debug.Assert(CurrentWindow != null, "CurrentWindow should not be null when adding a draw command.");
         CurrentWindow.DrawCommands.Add(drawCommand);
     }
-    public void PushId(string id) => CurrentWindow.PushId(id);
-    public void PopId() => CurrentWindow.PopId();
+    public void PushId(string id)
+    {
+        CurrentWindow?.PushId(NextFrameProperties, id);
+        NextFrameProperties = new() { Id = string.Empty };
+    }
+    public void PopId() => CurrentWindow?.PopId();
     
     
     public Dictionary<string, ComponentState> ComponentStates = new();

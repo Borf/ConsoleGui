@@ -52,7 +52,11 @@ public static partial class Gui
 
         if (menuState.OpenedId == menuItemId)
         {
-            Gui.Begin("#menuPopup", WindowFlags.HideBorder, sf.ScreenPos + sf.Cursor + new Vec2 { X = 0, Y = 1 }, new Vec2 { X = 30, Y = 2 }, 1);
+            SetNextBackgroundColor(Context.Style.MenuBackground);
+            Context.NextFrameProperties.ScreenPos = sf.ScreenPos + sf.Cursor + new Vec2 { X = -1, Y = 0 };
+            Context.NextFrameProperties.Size = new Vec2 { X = 30, Y = 2 };
+            Context.NextFrameProperties.AddMargin(new Vec2 { X = 2, Y = 1 });
+            Begin("#menuPopup", WindowFlags.HideBorder);
             var subMenuState = Context.GetComponentState<MenuState>(Context.CurrentId);
             subMenuState.ItemCount = 0;
             return true;
@@ -75,8 +79,6 @@ public static partial class Gui
         Context.PopId();
         Context.LastStackFrame.Cursor = sf.Cursor + new Vec2 { X = 0, Y = 1 };
 
-
-
         return false;
     }
 
@@ -86,7 +88,7 @@ public static partial class Gui
         var menuState = Context.GetComponentState<MenuState>(Context.CurrentId);
         Context.LastStackFrame.Size = new Vec2 { X = 30, Y = menuState.ItemCount+2 };
         var sf = Context.CascadedStackFrame;
-        Context.AddDrawCommand(new DrawBorderCommand(sf.ScreenPos! + new Vec2 { X = -2, Y = -1 }, sf.Size!, DrawBorderCommand.BorderType.Double, Context.Style.WindowBackground, Context.Style.WindowForeground, Context.Style.WindowBackground, null, true));
+        Context.AddDrawCommand(new DrawBorderCommand(sf.ScreenPos! + new Vec2 { X = -2, Y = -1 }, sf.Size!, DrawBorderCommand.BorderType.Double, true));
         Gui.End();
     }
 

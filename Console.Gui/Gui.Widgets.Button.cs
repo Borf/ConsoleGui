@@ -12,6 +12,7 @@ public static partial class Gui
 {
     public static bool Button(string text, bool big)
     {
+
         Context.PushId(text);
 
         var sf = Context.CascadedStackFrame;
@@ -32,10 +33,20 @@ public static partial class Gui
         if (state == 2)
             color = Context.Style.ButtonCenter.Lighter();
 
+        Context.LastStackFrame.BackgroundColor ??= color;
+        Context.LastStackFrame.TextColor ??= Context.Style.ButtonText;
+        Context.LastStackFrame.ForegroundColor ??= Context.Style.ButtonText;
+
+        if (Context.LastStackFrame.Size == null)
+            if (big)
+                Context.LastStackFrame.Size = new Vec2 { X = text.Length + 4, Y = 3 };
+
+
+
         if (big)
         {
-            Context.AddDrawCommand(new DrawBorderCommand(sf.ScreenPos + sf.Cursor, new Vec2 { X = text.Length+3, Y = 3}, DrawBorderCommand.BorderType.Round, Context.Style.WindowBackground, Context.Style.ButtonBorder, color, Context.Style.ButtonShadow));
-            Context.AddDrawCommand(new DrawTextCommand(text, sf.ScreenPos + sf.Cursor + new Vec2 { X = 2, Y = 1 }, new ElementProperties().SetBg(color).SetFg(Context.Style.ButtonText)));
+            Context.AddDrawCommand(new DrawBorderCommand(sf.ScreenPos + sf.Cursor, Context.LastStackFrame.Size, DrawBorderCommand.BorderType.Round));
+            Context.AddDrawCommand(new DrawTextCommand(text, sf.ScreenPos + sf.Cursor + new Vec2 { X = (Context.LastStackFrame.Size.X - text.Length)/2, Y = 1 }, new ElementProperties().SetBg(color).SetFg(Context.Style.ButtonText)));
         }
         else
         {

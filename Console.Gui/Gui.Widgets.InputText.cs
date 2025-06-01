@@ -38,11 +38,13 @@ public static partial class Gui
 
         if (big)
         {
-            Context.AddDrawCommand(new DrawBorderCommand(sf.ScreenPos + sf.Cursor + new Vec2 { X = 30, Y = 0}, new Vec2 { X = 30, Y = 3 }, DrawBorderCommand.BorderType.Round, Context.Style.WindowBackground, Context.Style.InputBorder, color, Context.Style.ButtonShadow));
+            //use color
+            Context.AddDrawCommand(new DrawBorderCommand(sf.ScreenPos + sf.Cursor + new Vec2 { X = 30, Y = 0}, new Vec2 { X = 30, Y = 3 }, DrawBorderCommand.BorderType.Round));
             Context.AddDrawCommand(new DrawTextCommand(value, sf.ScreenPos + sf.Cursor + new Vec2 { X = 32, Y = 1 }, new ElementProperties().SetBg(color).SetFg(Context.Style.InputText)));
         }
         else
         {
+            //use color
             Context.AddDrawCommand(new DrawTextCommand($"▏{new string(' ', 30-2)}▕", sf.ScreenPos + sf.Cursor + new Vec2 { X = 30, Y = 0 }, new ElementProperties().SetBg(color).SetFg(Context.Style.InputText).SetUnderLine().SetOverLine()));
             Context.AddDrawCommand(new DrawTextCommand($"{value}", sf.ScreenPos + sf.Cursor + new Vec2 { X = 31, Y = 0 }, new ElementProperties().SetBg(color).SetFg(Context.Style.InputText).SetUnderLine().SetOverLine()));
         }

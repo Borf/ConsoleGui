@@ -1,9 +1,6 @@
 ﻿using ConGui.Util;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Diagnostics;
+using System.Drawing;
 
 namespace ConGui;
 public class StackFrame
@@ -17,7 +14,19 @@ public class StackFrame
 
     public BorderDir? HasBorder { get; set; } = null;
 
-    //TODO: style?
+
+    public Color? BackgroundColor { get; set; } = null;
+    public Color? ForegroundColor { get; set; } = null;
+    public Color? TextColor { get; set; } = null;
+
+    public void AddMargin(Vec2 marginLeft, Vec2? marginRight = null)
+    {
+        if (marginRight == null)
+            marginRight = marginLeft;
+         Debug.Assert(ScreenPos != null && Size != null);
+        ScreenPos += marginLeft;
+        Size -= (marginLeft + marginRight);
+    }
 }
 
 

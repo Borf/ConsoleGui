@@ -131,35 +131,21 @@ public static partial class Gui
 
     public static void Render()
     {
-
-//        Debug.Assert(Context.Stack.Count == 0, "Stack should be empty after rendering.");
-
-
-
         var frameBuffer = new FrameBuffer(Console.WindowWidth, Console.WindowHeight);
 
-        foreach (var window in Context.Windows)
-        {
+        foreach (var window in Context.Windows) //TODO: order by window order
             foreach(var drawCommand in window.DrawCommands)
-            {
                 drawCommand.Draw(frameBuffer);
-            }
-        }
 
 
-
+        //debug info
         new DrawTextCommand(Math.Round(FrameTimes.Count / (FrameTimes.Last!.Value - FrameTimes.First!.Value), 1) + " FPS", new Vec2 { X = 0, Y = Console.WindowHeight-1 }, new ElementProperties().SetBg(Color.Black).SetFg(Color.White)) { Id = "" }.Draw(frameBuffer);
         Context.HoveredComponent = (Context.MousePos.X < frameBuffer.Width && Context.MousePos.Y < frameBuffer.Height) ? frameBuffer.Elements[Context.MousePos.X, Context.MousePos.Y].ObjectId : "";
         string debugLine = Context.HoveredComponent + " ";
         for (int i = 0; i < 3; i++)
             debugLine += Context.MouseStates[i].ToString()[0];
-
-
-
         new DrawTextCommand(debugLine, new Vec2 { X = Console.WindowWidth - debugLine.Length - 1, Y = 0 }, new ElementProperties()) { Id = "" }.Draw(frameBuffer);
         new DrawTextCommand((Environment.TickCount % 1000 < 500) ? "▓" : "░", new Vec2 { X = Context.MousePos.X, Y = Context.MousePos.Y }, new ElementProperties()) { Id = "" }.Draw(frameBuffer);
-
-
 
         frameBuffer.Draw();
     }
@@ -167,12 +153,8 @@ public static partial class Gui
 
     public static void DestroyContext()
     {
-
+        // we are C#, we don't need to dispose of things
     }
-
-
-
-
 
     public static bool CheckBox(string label, ref bool value)
     {
@@ -186,7 +168,31 @@ public static partial class Gui
 
 
 
+    public static void SetNextWidth(int nextWidth)
+    {
+        if(Context.NextFrameProperties.Size == null)
+            Context.NextFrameProperties.Size = new Vec2 { X = nextWidth, Y = 0 };
+        else
+            Context.NextFrameProperties.Size = new Vec2 { X = nextWidth, Y = Context.NextFrameProperties.Size.Y };
+    }
+    public static void SetNextHeight(int nextHeight)
+    {
+        if (Context.NextFrameProperties.Size == null)
+            Context.NextFrameProperties.Size = new Vec2 { X = 0, Y = nextHeight };
+        else
+            Context.NextFrameProperties.Size = new Vec2 { X = Context.NextFrameProperties.Size.X, Y = nextHeight };
+    }
+
+    public static void SetNextBackgroundColor(Color color) => Context.NextFrameProperties.BackgroundColor = color;
+    public static void SetNextForegroundColor(Color color) => Context.NextFrameProperties.ForegroundColor = color;
+    public static void SetNextTextColor(Color color) => Context.NextFrameProperties.TextColor = color;
+    public static void SetNextCursor(Vec2 cursor) => Context.NextFrameProperties.Cursor = cursor;
 
 
+
+    public static void SetNextBackgroundColorDefault(Color color) => Context.NextFrameProperties.BackgroundColor ??= color;
+    public static void SetNextForegroundColorDefault(Color color) => Context.NextFrameProperties.ForegroundColor ??= color;
+    public static void SetNextTextColorDefault(Color color) => Context.NextFrameProperties.TextColor ??= color;
+    public static void SetNextCursorDefault(Vec2 cursor) => Context.NextFrameProperties.Cursor ??= cursor;
 }
 
