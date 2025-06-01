@@ -25,14 +25,23 @@ public static partial class Gui
     public static bool BeginMenu(string value)
     {
         var sf = Context.CascadedStackFrame;
+        var menuState = Context.GetComponentState<MenuState>(Context.CurrentId);
 
-
+        var menuId = Context.CurrentId;
 
         Context.PushId(value);
+        if (Context.MouseStates[0].HasFlag(MouseState.Pressed))
+            if (!Context.HoveredComponent.StartsWith(menuId))
+                menuState.Opened = false;
+
+
+        menuState = Context.GetComponentState<MenuState>(Context.CurrentId);
+        if (Context.MouseStates[0].HasFlag(MouseState.Pressed))
+            if (Context.HoveredComponent == Context.CurrentId)
+                menuState.Opened = true;
 
         bool hovered = Context.HoveredComponent == Context.CurrentId;
-        bool opened = false;//TODO
-        var color = hovered ? Context.Style.MenuBackground.Darker().Darker() : Context.Style.MenuBackground;
+        var color = menuState.Opened ? Context.Style.MenuOpened : (hovered ? Context.Style.MenuBackground.Darker().Darker() : Context.Style.MenuBackground);
 
 
         Context.AddDrawCommand(new DrawTextCommand(value, sf.ScreenPos + sf.Cursor, new ElementProperties().SetBg(color).SetFg(Context.Style.WindowForeground)));
@@ -55,7 +64,7 @@ public static partial class Gui
 }
 
 
-class MenuState
+class MenuState : ComponentState
 {
     public bool Opened { get; set; } = false;
 }

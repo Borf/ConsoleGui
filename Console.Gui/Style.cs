@@ -19,8 +19,9 @@ public class Style
     public Color WindowForeground { get; set; } = Front;
 
     public Color MenuBackground { get; set; } = Primary.Darker().Darker();
+    public Color MenuOpened { get; set; } = Primary.Lighter().Lighter();
 
-    
+
     public Color ButtonBorder { get; set; } = Front;
     public Color ButtonCenter { get; set; } = Primary;
     public Color ButtonText { get; set; } = Front;
