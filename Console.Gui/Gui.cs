@@ -153,7 +153,7 @@ public static partial class Gui
 
 
 
-        new DrawTextCommand(Math.Round(FrameTimes.Count / (FrameTimes.Last!.Value - FrameTimes.First!.Value), 1) + " FPS", new Vec2 { X = 0, Y = 0 }, new ElementProperties().SetBg(Color.Black).SetFg(Color.White)) { Id = "" }.Draw(frameBuffer);
+        new DrawTextCommand(Math.Round(FrameTimes.Count / (FrameTimes.Last!.Value - FrameTimes.First!.Value), 1) + " FPS", new Vec2 { X = 0, Y = Console.WindowHeight-1 }, new ElementProperties().SetBg(Color.Black).SetFg(Color.White)) { Id = "" }.Draw(frameBuffer);
         Context.HoveredComponent = (Context.MousePos.X < frameBuffer.Width && Context.MousePos.Y < frameBuffer.Height) ? frameBuffer.Elements[Context.MousePos.X, Context.MousePos.Y].ObjectId : "";
         string debugLine = Context.HoveredComponent + " ";
         for (int i = 0; i < 3; i++)

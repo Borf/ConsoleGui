@@ -11,6 +11,24 @@ while(true)
 
     Gui.Begin("", WindowFlags.TopWindow | WindowFlags.HasMenu);
     {
+        Gui.BeginMenuBar();
+        if(Gui.BeginMenu("File"))
+        {
+            Gui.EndMenu();
+        }
+
+        if (Gui.BeginMenu("View"))
+        {
+            Gui.EndMenu();
+        }
+
+        if (Gui.BeginMenu("Options"))
+        {
+            Gui.EndMenu();
+        }
+        Gui.EndMenuBar();
+
+
         Gui.Split("Split", true, 30);
         {
             Gui.Text("Hello World");
