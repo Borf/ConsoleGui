@@ -12,38 +12,21 @@ public class Context
 {
     public List<Window> Windows { get; set; } = new();
     public List<string> WindowOrder { get; set; } = new();
-    //public LinkedList<Panel> PanelStack { get; set; } = new();
-    public LinkedList<StackFrame> Stack { get; set; } = new();
-    public StackFrame LastStackFrame => Stack.Last();
-    public StackFrame CascadedStackFrame => new StackFrame()
-    {
-        Id = CurrentId,
-        FrameType = Stack.LastOrDefault()?.FrameType, //should this be the last one or the cascaded one?
-        Cursor = Stack.LastOrDefault(sf => sf.Cursor != null)?.Cursor,
-        Size = Stack.LastOrDefault(sf => sf.Size != null)?.Size,
-        ScreenPos = Stack.LastOrDefault(sf => sf.ScreenPos != null)?.ScreenPos,
-        HasBorder = Stack.LastOrDefault(sf => sf.HasBorder != null)?.HasBorder
-    };
-    public Window? CurrentWindow { get; set; } = null;
-    public string CurrentId => string.Join("/", Stack.Select(s => s.Id));
+    public StackFrame LastStackFrame => CurrentWindow.Stack.Last();
+    public StackFrame CascadedStackFrame => CurrentWindow.CascadedStackFrame;
+    public string CurrentId => CurrentWindow?.CurrentId ?? "";
+
+
+    public LinkedList<Window> WindowCreationStack { get; set; } = new();
+    public Window? CurrentWindow => WindowCreationStack.LastOrDefault();
     public void AddDrawCommand(DrawCommand drawCommand)
     {
         drawCommand.Id = CurrentId;
         Debug.Assert(CurrentWindow != null, "CurrentWindow should not be null when adding a draw command.");
         CurrentWindow.DrawCommands.Add(drawCommand);
     }
-
-
-
-    public void PushId(string id)
-    {
-        var sf = new StackFrame() { Id = id };
-        Stack.AddLast(sf);
-    }
-    public void PopId()
-    {
-        Stack.RemoveLast();
-    }
+    public void PushId(string id) => CurrentWindow.PushId(id);
+    public void PopId() => CurrentWindow.PopId();
     
     
     public Dictionary<string, ComponentState> ComponentStates = new();

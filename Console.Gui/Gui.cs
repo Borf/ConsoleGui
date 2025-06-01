@@ -52,7 +52,6 @@ public static partial class Gui
     {
         //Context.PanelStack.Clear();
         Context.Windows.Clear();
-        Context.Stack.Clear(); // should be empty
 
         FrameTimes.AddLast(Environment.TickCount / 1000.0);
         while (FrameTimes.Count > 1000)
@@ -126,9 +125,6 @@ public static partial class Gui
             Console.BufferHeight = Console.WindowHeight;
             Console.BufferWidth = Console.WindowWidth;
         }
-
-
-        Context.PushId("Root");
     }
 
 
@@ -136,8 +132,7 @@ public static partial class Gui
     public static void Render()
     {
 
-        Context.PopId(); // root
-        Debug.Assert(Context.Stack.Count == 0, "Stack should be empty after rendering.");
+//        Debug.Assert(Context.Stack.Count == 0, "Stack should be empty after rendering.");
 
 
 

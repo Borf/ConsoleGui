@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ConGui.Util;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -17,7 +18,7 @@ public class Style
     public Color WindowBackground { get; set; } = Back;
     public Color WindowForeground { get; set; } = Front;
 
-    public Color MenuBackground { get; set; } = Dark;
+    public Color MenuBackground { get; set; } = Primary.Darker().Darker();
 
     
     public Color ButtonBorder { get; set; } = Front;

@@ -13,8 +13,9 @@ public static partial class Gui
 
     public static void Begin(string title, WindowFlags flags = 0)
     {
-        if (Context.CurrentWindow != null)
-            throw new Exception("Can't begin when there's a window open already");
+        Context.WindowCreationStack.AddLast(new Window() { Id = Context.CurrentId });
+        Context.Windows.Add(Context.CurrentWindow);
+        Context.PushId("Root" + title);
 
         if (flags.HasFlag(WindowFlags.TopWindow))
         {
@@ -32,8 +33,6 @@ public static partial class Gui
         {
         }
         Context.PushId(title);
-        Context.CurrentWindow = new Window() { Id = Context.CurrentId };
-        Context.Windows.Add(Context.CurrentWindow);
 
         var sf = Context.CascadedStackFrame;
 
@@ -59,8 +58,9 @@ public static partial class Gui
         if (Context.CurrentWindow == null)
             throw new Exception("Can't end when there's no window open");
         //TODO: assert stack is 1 and only the window
-        Context.CurrentWindow = null;
         Context.PopId();
+        Context.PopId();//root
+        Context.WindowCreationStack.RemoveLast();
     }
 
 }

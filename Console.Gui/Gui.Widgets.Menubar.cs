@@ -26,7 +26,17 @@ public static partial class Gui
     {
         var sf = Context.CascadedStackFrame;
 
-        Context.AddDrawCommand(new DrawTextCommand(value, sf.ScreenPos + sf.Cursor, new ElementProperties().SetBg(Context.Style.WindowBackground).SetFg(Context.Style.WindowForeground)));
+
+
+        Context.PushId(value);
+
+        bool hovered = Context.HoveredComponent == Context.CurrentId;
+        bool opened = false;//TODO
+        var color = hovered ? Context.Style.MenuBackground.Darker().Darker() : Context.Style.MenuBackground;
+
+
+        Context.AddDrawCommand(new DrawTextCommand(value, sf.ScreenPos + sf.Cursor, new ElementProperties().SetBg(color).SetFg(Context.Style.WindowForeground)));
+        Context.PopId();
 
         Context.LastStackFrame.Cursor += new Vec2 { X = value.Length + 2, Y = 0 }; // +1 for the space after the menu item
         return false;
@@ -42,4 +52,10 @@ public static partial class Gui
     }
 
  
+}
+
+
+class MenuState
+{
+    public bool Opened { get; set; } = false;
 }
