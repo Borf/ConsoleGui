@@ -30,6 +30,7 @@ public class FrameBuffer
     }
 
     public Vec2 Cursor { get; set; } = new() { X = 0, Y = 0 };
+    public bool NoOverrideSelf { get; set; } = false; // this thing is nasty
 
     public void Write(string? id, string text, ElementProperties properties)
     {
@@ -41,10 +42,13 @@ public class FrameBuffer
                 if (Cursor.X < Width && Cursor.Y < Height)
                 {
                     var el = Elements[Cursor.X, Cursor.Y];
-                    el.Character = text[i];
-                    el.Properties = properties;
-                    if (id != null)
-                        el.ObjectId = id;
+                    if (!NoOverrideSelf || (!el.ObjectId.StartsWith(id) && !id.StartsWith(el.ObjectId)))
+                    {
+                        el.Character = text[i];
+                        el.Properties = properties;
+                        if (id != null)
+                            el.ObjectId = id;
+                    }
                     Cursor += new Vec2() { X = 1, Y = 0 };
                 }
             }

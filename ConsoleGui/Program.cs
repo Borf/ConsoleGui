@@ -9,11 +9,17 @@ while(true)
 {
     Gui.BeginFrame();
 
-    Gui.Begin("", WindowFlags.TopWindow | WindowFlags.HasMenu);
+    Gui.Begin("#main", WindowFlags.TopWindow | WindowFlags.HasMenu);
     {
         Gui.BeginMenuBar();
         if(Gui.BeginMenu("File"))
         {
+            if (Gui.MenuItem("Open"))
+                Debug.WriteLine("Open clicked");
+            if (Gui.MenuItem("Save"))
+                Debug.WriteLine("Save clicked");
+            if (Gui.MenuItem("Quit"))
+                Environment.Exit(0);
             Gui.EndMenu();
         }
 

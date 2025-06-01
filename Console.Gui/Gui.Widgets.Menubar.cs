@@ -26,45 +26,76 @@ public static partial class Gui
     {
         var sf = Context.CascadedStackFrame;
         var menuState = Context.GetComponentState<MenuState>(Context.CurrentId);
-
         var menuId = Context.CurrentId;
 
         Context.PushId(value);
+
         if (Context.MouseStates[0].HasFlag(MouseState.Pressed))
             if (!Context.HoveredComponent.StartsWith(menuId))
-                menuState.Opened = false;
+                menuState.OpenedId = string.Empty;
 
-
-        menuState = Context.GetComponentState<MenuState>(Context.CurrentId);
         if (Context.MouseStates[0].HasFlag(MouseState.Pressed))
             if (Context.HoveredComponent == Context.CurrentId)
-                menuState.Opened = true;
+                menuState.OpenedId = Context.CurrentId;
 
         bool hovered = Context.HoveredComponent == Context.CurrentId;
-        var color = menuState.Opened ? Context.Style.MenuOpened : (hovered ? Context.Style.MenuBackground.Darker().Darker() : Context.Style.MenuBackground);
+        if(hovered && menuState.OpenedId.StartsWith(menuId))
+            menuState.OpenedId = Context.CurrentId;
 
 
+        var color = (menuState.OpenedId == Context.CurrentId) ? Context.Style.MenuOpened : (hovered ? Context.Style.MenuBackground.Darker().Darker() : Context.Style.MenuBackground);
         Context.AddDrawCommand(new DrawTextCommand(value, sf.ScreenPos + sf.Cursor, new ElementProperties().SetBg(color).SetFg(Context.Style.WindowForeground)));
+        var menuItemId = Context.CurrentId;
         Context.PopId();
 
-        Context.LastStackFrame.Cursor += new Vec2 { X = value.Length + 2, Y = 0 }; // +1 for the space after the menu item
-        return false;
+        Context.LastStackFrame.Cursor = Context.CascadedStackFrame.Cursor + new Vec2 { X = value.Length + 2, Y = 0 }; // +1 for the space after the menu item
+
+        if (menuState.OpenedId == menuItemId)
+        {
+            Gui.Begin("#menuPopup", WindowFlags.HideBorder, sf.ScreenPos + sf.Cursor + new Vec2 { X = 0, Y = 1 }, new Vec2 { X = 30, Y = 2 }, 1);
+            var subMenuState = Context.GetComponentState<MenuState>(Context.CurrentId);
+            subMenuState.ItemCount = 0;
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     public static bool MenuItem(string label)
     {
+        var menuState = Context.GetComponentState<MenuState>(Context.CurrentId);
+        menuState.ItemCount++;
+
+        Context.PushId(label);
+        var sf = Context.CascadedStackFrame;
+
+        Context.AddDrawCommand(new DrawTextCommand(label, sf.ScreenPos + sf.Cursor, new ElementProperties().SetBg(Context.Style.MenuBackground).SetFg(Context.Style.WindowForeground)));
+        Context.PopId();
+        Context.LastStackFrame.Cursor = sf.Cursor + new Vec2 { X = 0, Y = 1 };
+
+
+
         return false;
     }
 
+    //Because the menu is a dynamically resized window, draw the window after the contents so the size can still change while it is being drawn. Dirty hack, should fix this and make it more generic
     public static void EndMenu()
     {
+        var menuState = Context.GetComponentState<MenuState>(Context.CurrentId);
+        Context.LastStackFrame.Size = new Vec2 { X = 30, Y = menuState.ItemCount+2 };
+        var sf = Context.CascadedStackFrame;
+        Context.AddDrawCommand(new DrawBorderCommand(sf.ScreenPos! + new Vec2 { X = -2, Y = -1 }, sf.Size!, DrawBorderCommand.BorderType.Double, Context.Style.WindowBackground, Context.Style.WindowForeground, Context.Style.WindowBackground, null, true));
+        Gui.End();
     }
 
- 
+
 }
 
 
 class MenuState : ComponentState
 {
-    public bool Opened { get; set; } = false;
+    public int ItemCount { get; set; } = 0;
+    public string OpenedId { get; set; } = string.Empty;
 }

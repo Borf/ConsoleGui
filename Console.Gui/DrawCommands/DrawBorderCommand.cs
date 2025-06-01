@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace ConGui.DrawCommands;
-public class DrawBorderCommand(Vec2 pos, Vec2 size, DrawBorderCommand.BorderType type, Color bgColor, Color borderColor, Color insideColor, Color? shadowColor) : DrawCommand
+public class DrawBorderCommand(Vec2 pos, Vec2 size, DrawBorderCommand.BorderType type, Color bgColor, Color borderColor, Color insideColor, Color? shadowColor, bool noOverrideSelf = false) : DrawCommand
 {
     private Vec2 pos = pos;
     private Vec2 size = size;
@@ -17,9 +17,11 @@ public class DrawBorderCommand(Vec2 pos, Vec2 size, DrawBorderCommand.BorderType
     private readonly Color borderColor = borderColor;
     private readonly Color insideColor = insideColor;
     private readonly Color? shadowColor = shadowColor;
+    private readonly bool noOverrideSelf = noOverrideSelf;
 
     public override void Draw(FrameBuffer buffer)
     {
+        buffer.NoOverrideSelf = noOverrideSelf;
         buffer.Cursor = pos;
         if (type == BorderType.Double)
         {
@@ -102,6 +104,8 @@ public class DrawBorderCommand(Vec2 pos, Vec2 size, DrawBorderCommand.BorderType
             buffer.Cursor = pos + new Vec2 { X = 0, Y = size.Y - 1 };
             buffer.Write(Id, "╰" + new string('─', size.X-2) + "╯", new ElementProperties().SetFg(borderColor).SetBg(insideColor));
         }
+        buffer.NoOverrideSelf = false;
+
     }
 
     public enum BorderType
