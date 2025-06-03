@@ -11,10 +11,7 @@ public class StackFrame
 
     public Vec2? ScreenPos { get; set; } = null;
     public Vec2? Size { get; set; } = null;
-
     public BorderDir? HasBorder { get; set; } = null;
-
-
     public Color? BackgroundColor { get; set; } = null;
     public Color? ForegroundColor { get; set; } = null;
     public Color? TextColor { get; set; } = null;

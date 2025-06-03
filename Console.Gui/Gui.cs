@@ -15,6 +15,7 @@ namespace ConGui;
 
 public static partial class Gui
 {
+    public const string IdSeperator = "/";
     private static Context Context { get; set; } = null!;
 
     public static void CreateContext()
@@ -166,10 +167,13 @@ public static partial class Gui
 
     }
 
-    private static ComponentActivationState GetComponentActivationState()
+    private static ComponentActivationState GetComponentActivationState(string? suffix = null)
     {
+        var id = Context.CascadedStackFrame.Id;
+        if(suffix != null)
+            id += IdSeperator + suffix;
         var state = ComponentActivationState.Idle;
-        if (Context.HoveredComponent == Context.CascadedStackFrame.Id)
+        if (Context.HoveredComponent == id)
         {
             state = ComponentActivationState.Hovered;
             if (Context.MouseStates[0] == MouseState.Pressed)
