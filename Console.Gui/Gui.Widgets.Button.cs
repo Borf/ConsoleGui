@@ -15,22 +15,13 @@ public static partial class Gui
 
         Context.PushId(text);
 
+        var state = GetComponentActivationState();
         var sf = Context.CascadedStackFrame;
 
-        int state = 0;
-        if (Context.HoveredComponent == Context.CurrentId)
-        {
-            state = 1;
-            if (Context.MouseStates[0] == MouseState.Down || Context.MouseStates[1] == MouseState.Pressed)
-                state = 2;
-            if (Context.MouseStates[0] == MouseState.Released)
-                state = 3;
-        }
-
         var color = Context.Style.ButtonCenter;
-        if (state == 1)
+        if (state == ComponentActivationState.Hovered)
             color = Context.Style.ButtonCenter.Darker();
-        if (state == 2)
+        if (state == ComponentActivationState.Pressed)
             color = Context.Style.ButtonCenter.Lighter();
 
         Context.LastStackFrame.BackgroundColor ??= color;
@@ -55,7 +46,7 @@ public static partial class Gui
 
         Context.PopId();
         Context.LastStackFrame.Cursor += new Vec2 { X = 0, Y = big ? 3 : 1 };
-        return state == 3;
+        return state == ComponentActivationState.Released;
     }
 
 

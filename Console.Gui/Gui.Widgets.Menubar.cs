@@ -75,29 +75,22 @@ public static partial class Gui
         Context.PushId(label);
         var sf = Context.CascadedStackFrame;
 
-        int state = 0;
-
-        if(Context.HoveredComponent == sf.Id)
-        {
-            state = 1;
-            if (Context.MouseStates[0] == MouseState.Pressed)
-                state = 2;
-        }
+        var state = GetComponentActivationState();
 
         var color = Context.LastStackFrame.BackgroundColor;
-        if(state == 0)
-            color ??= Context.Style.MenuBackground;
-        if(state == 1)
+        if(state == ComponentActivationState.Hovered)
             color ??= Context.Style.MenuBackground.Darker();
-        if (state == 2)
+        else if (state == ComponentActivationState.Down || state == ComponentActivationState.Pressed)
             color ??= Context.Style.MenuBackground.Darker().Darker();
+        else 
+            color ??= Context.Style.MenuBackground;
 
 
         Context.AddDrawCommand(new DrawTextCommand(label, sf.ScreenPos + sf.Cursor, new ElementProperties().SetBg(color.Value).SetFg(Context.Style.WindowForeground)));
         Context.PopId();
         Context.LastStackFrame.Cursor = sf.Cursor + new Vec2 { X = 0, Y = 1 };
 
-        return state == 2;
+        return state == ComponentActivationState.Released;
     }
 
     //Because the menu is a dynamically resized window, draw the window after the contents so the size can still change while it is being drawn. Dirty hack, should fix this and make it more generic

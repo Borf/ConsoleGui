@@ -166,6 +166,23 @@ public static partial class Gui
 
     }
 
+    private static ComponentActivationState GetComponentActivationState()
+    {
+        var state = ComponentActivationState.Idle;
+        if (Context.HoveredComponent == Context.CascadedStackFrame.Id)
+        {
+            state = ComponentActivationState.Hovered;
+            if (Context.MouseStates[0] == MouseState.Pressed)
+                state = ComponentActivationState.Pressed;
+            if (Context.MouseStates[0] == MouseState.Down)
+                state = ComponentActivationState.Down;
+            if (Context.MouseStates[0] == MouseState.Released)
+                state = ComponentActivationState.Released;
+        }
+        //TODO: add selected state
+        return state;
+    }
+
 
 
     public static void SetNextWidth(int nextWidth)
