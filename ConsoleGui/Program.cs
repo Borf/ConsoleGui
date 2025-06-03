@@ -1,5 +1,9 @@
 ﻿using ConGui;
+using ConGui.Util;
 using System.Diagnostics;
+
+ConsoleHelper.Test();
+Console.ReadKey();
 
 Gui.CreateContext();
 

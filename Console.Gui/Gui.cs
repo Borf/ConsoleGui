@@ -23,7 +23,7 @@ public static partial class Gui
 
         Context = new Context();
 
-        ConsoleMode.Begin();
+        ConsoleHelper.Begin();
         Console.InputEncoding = System.Text.Encoding.UTF8;
         Console.OutputEncoding = System.Text.Encoding.UTF8;
         Console.Write(
@@ -148,6 +148,9 @@ public static partial class Gui
         new DrawTextCommand((Environment.TickCount % 1000 < 500) ? "▓" : "░", new Vec2 { X = Context.MousePos.X, Y = Context.MousePos.Y }, new ElementProperties()) { Id = "" }.Draw(frameBuffer);
 
         frameBuffer.Draw();
+
+
+        ConsoleHelper.Test();
     }
 
 
