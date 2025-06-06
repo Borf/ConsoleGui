@@ -24,7 +24,7 @@ public class Window
         ForegroundColor = Stack.LastOrDefault(sf => sf.ForegroundColor != null)?.ForegroundColor,
         TextColor = Stack.LastOrDefault(sf => sf.TextColor != null)?.TextColor,
     };
-    public string CurrentId => string.Join("/", Stack.Select(s => s.Id));
+    public string CurrentId => string.Join(Gui.IdSeperator, Stack.Select(s => s.Id));
 
     public void PushId(StackFrame templateFrame, string id)
     {
