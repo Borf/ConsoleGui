@@ -79,9 +79,9 @@ public static partial class Gui
 
         var color = Context.LastStackFrame.BackgroundColor;
         if(state == ComponentActivationState.Hovered)
-            color ??= Context.Style.MenuBackground.Darker();
+            color ??= Context.Style.MenuOpened;
         else if (state == ComponentActivationState.Down || state == ComponentActivationState.Pressed)
-            color ??= Context.Style.MenuBackground.Darker().Darker();
+            color ??= Context.Style.MenuOpened.Darker().Darker();
         else 
             color ??= Context.Style.MenuBackground;
 

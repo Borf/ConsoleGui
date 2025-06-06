@@ -14,7 +14,6 @@ public static partial class Gui
     {
         Context.PushId(text);
         var sf = Context.CascadedStackFrame;
-
         Context.AddDrawCommand(new DrawTextCommand(text, sf.ScreenPos + sf.Cursor, new ElementProperties().SetBg(Context.Style.WindowBackground).SetFg(Context.Style.WindowForeground)));
         Context.PopId();
         Context.LastStackFrame.Cursor = sf.Cursor + new Vec2 { X = 0, Y = 1 };

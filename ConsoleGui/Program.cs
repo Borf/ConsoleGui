@@ -1,9 +1,7 @@
 ﻿using ConGui;
 using ConGui.Util;
+using System.ComponentModel;
 using System.Diagnostics;
-
-ConsoleHelper.Test();
-Console.ReadKey();
 
 Gui.CreateContext();
 
@@ -41,9 +39,17 @@ while(true)
 
         Gui.Split("Split", true, 30);
         {
-            Gui.Text("Hello World");
-            Gui.Text("Second line");
+            Gui.BeginList("Tables");
+            {
+                for (int i = 0; i < 100; i++)
+                {
+                    if (Gui.ListEntry("Entry " + i, ListChangedEvent.OnSelect))
+                    {
 
+                    }
+                }
+            }
+            Gui.EndList();
         }
         Gui.NextSplit();
         {
@@ -75,6 +81,8 @@ while(true)
             }
             if (Gui.BeginTab("Browse"))
             {
+                Gui.Text("Hello World");
+                Gui.Text("Second line");
 
                 Gui.EndTab();
             }

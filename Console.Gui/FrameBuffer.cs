@@ -67,6 +67,8 @@ public class FrameBuffer
             var sb = new StringBuilder();
             var begin = 0;
             var last = Elements[0, y];
+//            Console.SetCursorPosition(0, y);
+            string line = "";
             for (int x = 0; x < Width; x++)
             {
                 var current = Elements[x, y];
@@ -74,9 +76,10 @@ public class FrameBuffer
                 {
                     if (x == Width - 1)
                         sb.Append(current.Character);
-                    Console.SetCursorPosition(begin, y);
+                    //Console.SetCursorPosition(begin, y);
                      
                     ANSIString str = new ANSIString(sb.ToString());
+
                     if (last.Properties.FgColor.HasValue)
                         str = str.Color(last.Properties.FgColor.Value);
                     if (last.Properties.BgColor.HasValue)
@@ -85,7 +88,8 @@ public class FrameBuffer
                         str = str.Underlined();
                     if (last.Properties.OverLine.HasValue && last.Properties.OverLine.Value == true)
                         str = str.Overlined();
-                    Console.Write(str);
+//                    Console.Write(str);
+                    line += str;
                     sb.Clear();
                     begin = x;
                 }
@@ -93,6 +97,7 @@ public class FrameBuffer
                     sb.Append(current.Character);
                 last = current;
             }
+            Console.Write(line);
 
         }
     }

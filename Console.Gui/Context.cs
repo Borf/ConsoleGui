@@ -57,6 +57,7 @@ public class Context
     public string HoveredComponent { get; set; } = string.Empty;
 
     public Style Style { get; set; } = new Style();
+    public int MouseScroll { get; set; } = 0;
 }
 
 public class ComponentState

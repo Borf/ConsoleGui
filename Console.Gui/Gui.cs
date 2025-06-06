@@ -84,16 +84,21 @@ public static partial class Gui
                 Context.MousePos = new Vec2 { X = int.Parse(p[1]) - 1, Y = int.Parse(p[2]) - 1 };
                 int mouseEvent = int.Parse(p[0]);
 
-
+                //mouse movement
                 for (int i = 0; i < 3; i++)
                     if (MouseEventCodes[i].Contains(mouseEvent) && (pressed || released))
                     {
                         pressState[i] = pressed ? true : false;
                         lastMouseEvent = i;
                     }
-
                 if (mouseEvent == 35) //windows only???
                     pressState[lastMouseEvent] = pressed ? true : false;
+
+                if(mouseEvent == 64) // scroll up
+                    Context.MouseScroll = -1;
+                else if (mouseEvent == 65) // scroll down
+                    Context.MouseScroll = 1;
+
 
             }
             if (result.Length > code.Length + 2)
@@ -150,8 +155,7 @@ public static partial class Gui
 
         frameBuffer.Draw();
 
-
-        ConsoleHelper.Test();
+        Context.MouseScroll = 0;
     }
 
 

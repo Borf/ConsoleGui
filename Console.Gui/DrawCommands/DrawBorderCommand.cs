@@ -70,6 +70,18 @@ public class DrawBorderCommand(Vec2 pos, Vec2 size, DrawBorderCommand.BorderType
             buffer.Cursor = pos + new Vec2 { X = 0, Y = size.Y - 1 };
             buffer.Write(Id, "╰" + new string('─', size.X-2) + "╯", standardElement);
         }
+        if (type == BorderType.Single)
+        {
+            buffer.Cursor = pos + new Vec2 { X = 0, Y = 0 };
+            buffer.Write(Id, "┌" + new string('─', size.X - 2) + "┐", standardElement);
+            for (int i = 0; i < size.Y - 1; i++)
+            {
+                buffer.Cursor = pos + new Vec2 { X = 0, Y = i + 1 };
+                buffer.Write(Id, "│" + new string(' ', size.X - 2) + "│", standardElement);
+            }
+            buffer.Cursor = pos + new Vec2 { X = 0, Y = size.Y - 1 };
+            buffer.Write(Id, "└" + new string('─', size.X - 2) + "┘", standardElement);
+        }
         buffer.NoOverrideSelf = false;
 
     }
