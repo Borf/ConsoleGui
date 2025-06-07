@@ -61,23 +61,18 @@ public class FrameBuffer
 
     public void Draw()
     {
-        Console.SetCursorPosition(0, 0);
-        for(int y = 0; y < Height; y++)
+        StringBuilder screenBuffer = new();
+
+        var last = Elements[0, 0];
+        StringBuilder sb = new();
+        for (int y = 0; y < Height; y++)
         {
-            var sb = new StringBuilder();
             var begin = 0;
-            var last = Elements[0, y];
-//            Console.SetCursorPosition(0, y);
-            string line = "";
             for (int x = 0; x < Width; x++)
             {
                 var current = Elements[x, y];
-                if (!last.Properties.Equals(current.Properties) || x == Width-1)
+                if (!last.Properties.Equals(current.Properties))
                 {
-                    if (x == Width - 1)
-                        sb.Append(current.Character);
-                    //Console.SetCursorPosition(begin, y);
-                     
                     ANSIString str = new ANSIString(sb.ToString());
 
                     if (last.Properties.FgColor.HasValue)
@@ -88,18 +83,17 @@ public class FrameBuffer
                         str = str.Underlined();
                     if (last.Properties.OverLine.HasValue && last.Properties.OverLine.Value == true)
                         str = str.Overlined();
-//                    Console.Write(str);
-                    line += str;
+                    screenBuffer.Append(str);
                     sb.Clear();
                     begin = x;
                 }
-                if(x != Width-1)// if this is the last character, we already printed it so we can skip it
-                    sb.Append(current.Character);
+                sb.Append(current.Character);
                 last = current;
             }
-            Console.Write(line);
-
         }
+        //Console.SetCursorPosition(0, 0);
+        Console.Write("\x1b[0;0H");
+        Console.Write(screenBuffer);
     }
 }
 

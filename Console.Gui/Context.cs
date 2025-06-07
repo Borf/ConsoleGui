@@ -19,6 +19,9 @@ public class Context
     public string CurrentId => CurrentWindow?.CurrentId ?? "";
 
 
+    public string FocussedComponent = string.Empty;
+    public Vec2? MouseFocus = null;
+
     public LinkedList<Window> WindowCreationStack { get; set; } = new();
     public Window? CurrentWindow => WindowCreationStack.LastOrDefault();
     public void AddDrawCommand(DrawCommand drawCommand)
@@ -49,8 +52,10 @@ public class Context
         return (T)ComponentStates[id];
     }
 
-    
-    
+
+    public string KeyInput = string.Empty;
+
+    public List<(KeyModifier Modifier, Key Key)> KeyButtonInput = new();
     public Vec2 MousePos = Vec2.Zero;
     public MouseState[] MouseStates { get; set; } = [MouseState.Up, MouseState.Up, MouseState.Up];
 
@@ -73,3 +78,26 @@ public enum MouseState
     Released,
 }
 
+public enum Key
+{
+    Up,
+    Down,
+    Left,
+    Right,
+    Esc,
+    Tab,
+    Backspace,
+    Delete,
+    Home,
+    End,
+    A
+}
+
+[Flags]
+public enum KeyModifier
+{
+    None = 0,
+    Ctrl = 1<<0,
+    Shift = 1<<1,
+    Alt = 1<<2,
+}

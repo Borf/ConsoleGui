@@ -59,8 +59,13 @@ public class Style
     public Color ButtonCenter { get; set; } = Primary;
     public Color ButtonText { get; set; } = Front;
     public Color ButtonShadow { get; set; } = Color.Black;
-    public Color InputBorder { get; set; } = Front;
+    
+    public Color InputBorder { get; set; } = WarningBorder;
     public Color InputCenter { get; set; } = Dark;
+    public Color InputHovered { get; set; } = Back;
+
+    public Color InputBorderSelected { get; set; } = Warning;
+    public Color InputSelected { get; set; } = Secondary;
     public Color InputText { get; set; } = Front;
 
     public Color TabSelected { get; set; } = Primary;

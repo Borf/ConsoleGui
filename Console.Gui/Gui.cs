@@ -9,6 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace ConGui;
@@ -33,7 +34,7 @@ public static partial class Gui
             //"\u001B[?1002h" + // Cell Motion Mouse Tracking (only click)
             "\u001B[?1006h" + // MOUSE_MODE_SGR
             "\u001B[?1015h" + // MOUSE_MODE_URXVT                 
-            "\e[?25l" + // hide cursor
+//            "\e[?25l" + // hide cursor
             ""
             );
     }
@@ -58,6 +59,10 @@ public static partial class Gui
         while (FrameTimes.Count > 1000)
             FrameTimes.RemoveFirst();
 
+//        while(!Console.KeyAvailable)
+//           Thread.Sleep(1);
+
+
         var result = "";
         while (Console.KeyAvailable)
         {
@@ -70,7 +75,31 @@ public static partial class Gui
             string code = result[1..];
             if (code.Contains('\e'))
                 code = code[0..(code.IndexOf('\e') - 1)];
-            //Debug.WriteLine("Code: " + code);
+            Debug.WriteLine("Code: " + code);
+            //TODO: base length base on code first character?
+            //[< ends with m or M
+            //[A
+            //ChatGPT has a nice answer
+
+            KeyModifier modifier = KeyModifier.None;
+
+            if (code.StartsWith("[1;"))
+            {
+                char key = code[3]; // 2 = shift, 3 = alt, 5 = ctrl
+                code = "[" + code[4..];
+                result = result[2..]; //ewwww
+
+                if (key == '2')
+                    modifier |= KeyModifier.Shift;
+                else if (key == '3')
+                    modifier |= KeyModifier.Alt;
+                else if (key == '5')
+                    modifier |= KeyModifier.Ctrl;
+                else
+                    throw new Exception("Unkown modifier: " + key);
+
+            }
+
 
             if (code.StartsWith("[<"))
             {
@@ -94,17 +123,65 @@ public static partial class Gui
                 if (mouseEvent == 35) //windows only???
                     pressState[lastMouseEvent] = pressed ? true : false;
 
-                if(mouseEvent == 64) // scroll up
+                if (mouseEvent == 64) // scroll up
                     Context.MouseScroll = -1;
                 else if (mouseEvent == 65) // scroll down
                     Context.MouseScroll = 1;
-
-
             }
+            else if (code == ("[A"))
+                Context.KeyButtonInput.Add((modifier, Key.Up));
+            else if (code == ("[B"))
+                Context.KeyButtonInput.Add((modifier, Key.Down));
+            else if (code == ("[C"))
+                Context.KeyButtonInput.Add((modifier, Key.Right));
+            else if (code == ("[D"))
+                Context.KeyButtonInput.Add((modifier, Key.Left));
+            else if (code == ("[F"))
+                Context.KeyButtonInput.Add((modifier, Key.End));
+            else if (code == ("[H"))
+                Context.KeyButtonInput.Add((modifier, Key.Home));
+            else if (code == ("[3~"))
+                Context.KeyButtonInput.Add((modifier, Key.Delete));
             if (result.Length > code.Length + 2)
                 result = result[(code.Length + 2)..];
             else
                 result = "";
+        }
+
+        if(result.Contains('\u001b'))
+        {
+            Context.KeyButtonInput.Add((KeyModifier.None, Key.Esc));
+            Context.FocussedComponent = string.Empty; // clear focus on escape  
+            result = result.Replace("\u001b", "");
+            Console.Write("\e[?25l"); // hide cursor
+        }
+        if (result.Contains('\u007f'))
+        {
+            Context.KeyButtonInput.Add((KeyModifier.None, Key.Backspace));
+            result = result.Replace("\u007f", "");
+        }
+        if (result.Contains('\u0001'))
+        {
+            Context.KeyButtonInput.Add((KeyModifier.Ctrl, Key.A));
+            result = result.Replace("\u0001", "");
+        }
+        if (result.Contains('\t'))
+        {
+            Context.KeyButtonInput.Add((KeyModifier.None, Key.Tab));
+            result = result.Replace("\t", "");
+        }
+
+        if (!string.IsNullOrEmpty(result))
+        {
+            foreach (var c in result)
+            {
+                if (c < 32)
+                {
+                    Debug.WriteLine("Removed character ID " + (int)c);
+                    result.Replace(c + "", "");
+                }
+            }
+            Context.KeyInput += result;
         }
 
 
@@ -153,9 +230,32 @@ public static partial class Gui
         new DrawTextCommand(debugLine, new Vec2 { X = Console.WindowWidth - debugLine.Length - 1, Y = 0 }, new ElementProperties()) { Id = "" }.Draw(frameBuffer);
         new DrawTextCommand((Environment.TickCount % 1000 < 500) ? "▓" : "░", new Vec2 { X = Context.MousePos.X, Y = Context.MousePos.Y }, new ElementProperties()) { Id = "" }.Draw(frameBuffer);
 
+
+
+        //if (Context.MouseFocus == null)
+        {
+            Console.Write("\e[?25l"); // hide cursor
+            //Console.CursorVisible = false;
+        }
+
+        Console.Write("\x1b[s"); //save cursor
         frameBuffer.Draw();
+        Console.Write("\x1b[u"); // restore cursor
+
+
+        if (Context.MouseFocus != null)
+        {
+            //Console.SetCursorPosition(Context.MouseFocus.X, Context.MouseFocus.Y);
+            Console.Write($"\e[{Context.MouseFocus.Y+1};{Context.MouseFocus.X+1}H");
+            Console.Write("\e[?25h"); // show cursor
+
+            //Console.CursorVisible = true;
+        }
+
 
         Context.MouseScroll = 0;
+        Context.KeyInput = string.Empty;
+        Context.KeyButtonInput.Clear();
     }
 
 
@@ -192,6 +292,16 @@ public static partial class Gui
         }
         //TODO: add selected state
         return state;
+    }
+
+
+    private static bool HandleFocus()
+    {
+        if(Context.HoveredComponent == Context.CurrentId && Context.MouseStates[0] == MouseState.Pressed)
+        {
+            Context.FocussedComponent = Context.CurrentId;
+        }
+        return Context.FocussedComponent == Context.CurrentId;
     }
 
 
