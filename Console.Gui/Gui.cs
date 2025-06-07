@@ -48,6 +48,7 @@ public static partial class Gui
         [2, 10, 14, 18, 22, 26, 30, 34, 42, 46, 50, 54, 58, 62]
     ];
     static int lastMouseEvent = 0;
+    private static readonly Regex AnsiRegex = new Regex(@"\x1B\[([<>=?]?[0-9;]*[A-Za-z])", RegexOptions.Compiled);
 
 
     public static void BeginFrame()
@@ -70,82 +71,72 @@ public static partial class Gui
             result += key.KeyChar;
         }
 
-        while (result.Length > 1 && result[0] == '\e')
+        if(!string.IsNullOrEmpty(result))
         {
-            string code = result[1..];
-            if (code.Contains('\e'))
-                code = code[0..(code.IndexOf('\e') - 1)];
-            Debug.WriteLine("Code: " + code);
-            //TODO: base length base on code first character?
-            //[< ends with m or M
-            //[A
-            //ChatGPT has a nice answer
-
+            var matches = AnsiRegex.Matches(result);
             KeyModifier modifier = KeyModifier.None;
-
-            if (code.StartsWith("[1;"))
+            foreach (Match match in matches)
             {
-                char key = code[3]; // 2 = shift, 3 = alt, 5 = ctrl
-                code = "[" + code[4..];
-                result = result[2..]; //ewwww
+                string code = match.Groups[1].Value;
+                //Debug.WriteLine(code);
+                if (code.StartsWith("1;"))
+                {
+                    char key = code[2]; // 2 = shift, 3 = alt, 5 = ctrl
+                    code = code[3..];
 
-                if (key == '2')
-                    modifier |= KeyModifier.Shift;
-                else if (key == '3')
-                    modifier |= KeyModifier.Alt;
-                else if (key == '5')
-                    modifier |= KeyModifier.Ctrl;
-                else
-                    throw new Exception("Unkown modifier: " + key);
+                    if (key == '2')
+                        modifier |= KeyModifier.Shift;
+                    else if (key == '3')
+                        modifier |= KeyModifier.Alt;
+                    else if (key == '5')
+                        modifier |= KeyModifier.Ctrl;
+                    else
+                        throw new Exception("Unkown modifier: " + key);
+
+                }
+                if (code.StartsWith("<"))
+                {
+                    var pressed = code.EndsWith("M");
+                    var released = code.EndsWith("m");
+                    if (pressed || released)
+                        code = code[0..^1];
+
+                    var p = code[1..].Split(";");
+                    Context.MousePos = new Vec2 { X = int.Parse(p[1]) - 1, Y = int.Parse(p[2]) - 1 };
+                    int mouseEvent = int.Parse(p[0]);
+
+                    //mouse movement
+                    for (int i = 0; i < 3; i++)
+                        if (MouseEventCodes[i].Contains(mouseEvent) && (pressed || released))
+                        {
+                            pressState[i] = pressed ? true : false;
+                            lastMouseEvent = i;
+                        }
+                    if (mouseEvent == 35) //windows only???
+                        pressState[lastMouseEvent] = pressed ? true : false;
+
+                    if (mouseEvent == 64) // scroll up
+                        Context.MouseScroll = -1;
+                    else if (mouseEvent == 65) // scroll down
+                        Context.MouseScroll = 1;
+                }
+                else if (code == ("A"))
+                    Context.KeyButtonInput.Add((modifier, Key.Up));
+                else if (code == ("B"))
+                    Context.KeyButtonInput.Add((modifier, Key.Down));
+                else if (code == ("C"))
+                    Context.KeyButtonInput.Add((modifier, Key.Right));
+                else if (code == ("D"))
+                    Context.KeyButtonInput.Add((modifier, Key.Left));
+                else if (code == ("F"))
+                    Context.KeyButtonInput.Add((modifier, Key.End));
+                else if (code == ("H"))
+                    Context.KeyButtonInput.Add((modifier, Key.Home));
+                else if (code == ("3~"))
+                    Context.KeyButtonInput.Add((modifier, Key.Delete));
 
             }
-
-
-            if (code.StartsWith("[<"))
-            {
-                var pressed = code.EndsWith("M");
-                var released = code.EndsWith("m");
-                if (pressed || released)
-                    code = code[0..^1];
-
-
-                var p = code[2..].Split(";");
-                Context.MousePos = new Vec2 { X = int.Parse(p[1]) - 1, Y = int.Parse(p[2]) - 1 };
-                int mouseEvent = int.Parse(p[0]);
-
-                //mouse movement
-                for (int i = 0; i < 3; i++)
-                    if (MouseEventCodes[i].Contains(mouseEvent) && (pressed || released))
-                    {
-                        pressState[i] = pressed ? true : false;
-                        lastMouseEvent = i;
-                    }
-                if (mouseEvent == 35) //windows only???
-                    pressState[lastMouseEvent] = pressed ? true : false;
-
-                if (mouseEvent == 64) // scroll up
-                    Context.MouseScroll = -1;
-                else if (mouseEvent == 65) // scroll down
-                    Context.MouseScroll = 1;
-            }
-            else if (code == ("[A"))
-                Context.KeyButtonInput.Add((modifier, Key.Up));
-            else if (code == ("[B"))
-                Context.KeyButtonInput.Add((modifier, Key.Down));
-            else if (code == ("[C"))
-                Context.KeyButtonInput.Add((modifier, Key.Right));
-            else if (code == ("[D"))
-                Context.KeyButtonInput.Add((modifier, Key.Left));
-            else if (code == ("[F"))
-                Context.KeyButtonInput.Add((modifier, Key.End));
-            else if (code == ("[H"))
-                Context.KeyButtonInput.Add((modifier, Key.Home));
-            else if (code == ("[3~"))
-                Context.KeyButtonInput.Add((modifier, Key.Delete));
-            if (result.Length > code.Length + 2)
-                result = result[(code.Length + 2)..];
-            else
-                result = "";
+            result = AnsiRegex.Replace(result, "");
         }
 
         if(result.Contains('\u001b'))
@@ -297,9 +288,12 @@ public static partial class Gui
 
     private static bool HandleFocus()
     {
-        if(Context.HoveredComponent == Context.CurrentId && Context.MouseStates[0] == MouseState.Pressed)
+        if(Context.MouseStates[0] == MouseState.Pressed)
         {
-            Context.FocussedComponent = Context.CurrentId;
+            if (Context.HoveredComponent == Context.CurrentId)
+                Context.FocussedComponent = Context.CurrentId;
+            else if(Context.FocussedComponent == Context.CurrentId)
+                Context.FocussedComponent = string.Empty;
         }
         return Context.FocussedComponent == Context.CurrentId;
     }
