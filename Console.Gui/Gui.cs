@@ -21,7 +21,7 @@ public static partial class Gui
 
     public static void CreateContext()
     {
-        if (!ANSIInitializer.Init(false)) ANSIInitializer.Enabled = false;
+        //if (!ANSIInitializer.Init(false)) ANSIInitializer.Enabled = false;
 
         Context = new Context();
 
@@ -247,6 +247,7 @@ public static partial class Gui
         Context.MouseScroll = 0;
         Context.KeyInput = string.Empty;
         Context.KeyButtonInput.Clear();
+        Thread.Sleep(1);
     }
 
 
