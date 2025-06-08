@@ -8,7 +8,8 @@ public class StackFrame
     public required string Id { get; set; } = string.Empty;
     public string? FrameType { get; set; } = null;
     public Vec2? Cursor { get; set; } = null;
-
+    public int LastHeight { get; set; } = 0;
+    public bool SameLine { get; set; } = false;
     public Vec2? ScreenPos { get; set; } = null;
     public Vec2? Size { get; set; } = null;
     public BorderDir? HasBorder { get; set; } = null;

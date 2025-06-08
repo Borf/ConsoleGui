@@ -12,11 +12,17 @@ public static partial class Gui
 {
     public static void Text(string text)
     {
+        if (!Context.NextFrameProperties.SameLine)
+            Context.SetLastCursor(new Vec2 { X = 0, Y = (Context.CascadedStackFrame.Cursor?.Y ?? 0) + Context.CascadedStackFrame.LastHeight }, 0);
+
+        SetNextTextColorDefault(Style.WindowForeground);
         Context.PushId(text);
         var sf = Context.CascadedStackFrame;
-        Context.AddDrawCommand(new DrawTextCommand(text, sf.ScreenPos + sf.Cursor, new ElementProperties().SetBg(Context.Style.WindowBackground).SetFg(Context.Style.WindowForeground)));
+        int width = Context.LastStackFrame.Size?.X ?? text.Length + 1;
+        Context.AddDrawCommand(new DrawTextCommand(text, sf.ScreenPos + sf.Cursor, new ElementProperties().SetBg(Style.WindowBackground).SetFg(sf.TextColor.Value)));
         Context.PopId();
-        Context.LastStackFrame.Cursor = sf.Cursor + new Vec2 { X = 0, Y = 1 };
+
+        Context.SetLastCursor(new Vec2 { X = sf.Cursor.X + width, Y = sf.Cursor.Y }, 1);
     }
 
 

@@ -18,6 +18,7 @@ public static partial class Gui
 {
     public const string IdSeperator = "/";
     private static Context Context { get; set; } = null!;
+    public static Style Style { get; set; } = new Style();
 
     public static void CreateContext()
     {
@@ -263,7 +264,7 @@ public static partial class Gui
 
     public static void SameLine()
     {
-
+        Context.NextFrameProperties.SameLine = true;
     }
 
     private static ComponentActivationState GetComponentActivationState(string? suffix = null)
@@ -300,6 +301,8 @@ public static partial class Gui
     }
 
 
+    public static void PushId(string id) => Context.PushId(id);
+    public static void PopId() => Context.PopId();
 
     public static void SetNextWidth(int nextWidth)
     {

@@ -43,8 +43,8 @@ public static partial class Gui
         if(hovered && menuState.OpenedId.StartsWith(menuId))
             menuState.OpenedId = Context.CurrentId;
 
-        var color = (menuState.OpenedId == Context.CurrentId) ? Context.Style.MenuOpened : (hovered ? Context.Style.MenuBackground.Darker().Darker() : Context.Style.MenuBackground);
-        Context.AddDrawCommand(new DrawTextCommand(value, sf.ScreenPos + sf.Cursor, new ElementProperties().SetBg(color).SetFg(Context.Style.WindowForeground)));
+        var color = (menuState.OpenedId == Context.CurrentId) ? Style.MenuOpened : (hovered ? Style.MenuBackground.Darker().Darker() : Style.MenuBackground);
+        Context.AddDrawCommand(new DrawTextCommand(value, sf.ScreenPos + sf.Cursor, new ElementProperties().SetBg(color).SetFg(Style.WindowForeground)));
         var menuItemId = Context.CurrentId;
         Context.PopId();
 
@@ -52,7 +52,7 @@ public static partial class Gui
 
         if (menuState.OpenedId == menuItemId)
         {
-            SetNextBackgroundColor(Context.Style.MenuBackground);
+            SetNextBackgroundColor(Style.MenuBackground);
             Context.NextFrameProperties.ScreenPos = sf.ScreenPos + sf.Cursor + new Vec2 { X = -1, Y = 0 };
             Context.NextFrameProperties.Size = new Vec2 { X = 30, Y = 2 };
             Context.NextFrameProperties.AddMargin(new Vec2 { X = 2, Y = 1 });
@@ -79,14 +79,14 @@ public static partial class Gui
 
         var color = Context.LastStackFrame.BackgroundColor;
         if(state == ComponentActivationState.Hovered)
-            color ??= Context.Style.MenuOpened;
+            color ??= Style.MenuOpened;
         else if (state == ComponentActivationState.Down || state == ComponentActivationState.Pressed)
-            color ??= Context.Style.MenuOpened.Darker().Darker();
+            color ??= Style.MenuOpened.Darker().Darker();
         else 
-            color ??= Context.Style.MenuBackground;
+            color ??= Style.MenuBackground;
 
 
-        Context.AddDrawCommand(new DrawTextCommand(label, sf.ScreenPos + sf.Cursor, new ElementProperties().SetBg(color.Value).SetFg(Context.Style.WindowForeground)));
+        Context.AddDrawCommand(new DrawTextCommand(label, sf.ScreenPos + sf.Cursor, new ElementProperties().SetBg(color.Value).SetFg(Style.WindowForeground)));
         Context.PopId();
         Context.LastStackFrame.Cursor = sf.Cursor + new Vec2 { X = 0, Y = 1 };
 

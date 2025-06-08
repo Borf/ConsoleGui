@@ -23,6 +23,8 @@ public class Window
         BackgroundColor = Stack.LastOrDefault(sf => sf.BackgroundColor != null)?.BackgroundColor,
         ForegroundColor = Stack.LastOrDefault(sf => sf.ForegroundColor != null)?.ForegroundColor,
         TextColor = Stack.LastOrDefault(sf => sf.TextColor != null)?.TextColor,
+        LastHeight = Stack.LastOrDefault(sf => sf.LastHeight != 0)?.LastHeight ?? 0,
+        SameLine = Stack.LastOrDefault()?.SameLine ?? false,
     };
     public string CurrentId => string.Join(Gui.IdSeperator, Stack.Select(s => s.Id));
 

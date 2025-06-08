@@ -19,6 +19,14 @@ public class Context
     public string CurrentId => CurrentWindow?.CurrentId ?? "";
 
 
+    public void SetLastCursor(Vec2 cursor, int height)
+    {
+        if (CurrentWindow == null)
+            throw new Exception("Current window not set");
+        CurrentWindow.Stack.Last(c => c.Cursor != null).Cursor = cursor;
+        CurrentWindow.Stack.Last(c => c.Cursor != null).LastHeight = height;
+    }
+
     public string FocussedComponent = string.Empty;
     public Vec2? MouseFocus = null;
 
@@ -60,8 +68,6 @@ public class Context
     public MouseState[] MouseStates { get; set; } = [MouseState.Up, MouseState.Up, MouseState.Up];
 
     public string HoveredComponent { get; set; } = string.Empty;
-
-    public Style Style { get; set; } = new Style();
     public int MouseScroll { get; set; } = 0;
 }
 

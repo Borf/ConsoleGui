@@ -49,9 +49,9 @@ public static partial class Gui
         }
 
         SetNextCursorDefault(new Vec2 { X = 0, Y = 0 });
-        SetNextBackgroundColorDefault(Context.Style.WindowBackground);
-        SetNextForegroundColorDefault(Context.Style.WindowForeground);
-        SetNextTextColorDefault(Context.Style.WindowForeground);
+        SetNextBackgroundColorDefault(Style.WindowBackground);
+        SetNextForegroundColorDefault(Style.WindowForeground);
+        SetNextTextColorDefault(Style.WindowForeground);
         Context.PushId(title);
 
         var sf = Context.CascadedStackFrame;
@@ -66,13 +66,13 @@ public static partial class Gui
             if(!flags.HasFlag(WindowFlags.HideBorder))
                 Context.AddDrawCommand(new DrawBorderCommand(sf.ScreenPos!, sf.Size!, DrawBorderCommand.BorderType.Double));
             if (!string.IsNullOrEmpty(title.StripHash()))
-                Context.CurrentWindow.DrawCommands.Add(new DrawTextCommand($" {title.StripHash()} ", sf.ScreenPos! + new Vec2 { X = (sf.Size!.X - title.Length) / 2, Y = -1 }, new ElementProperties().SetBg(Context.Style.WindowBackground).SetFg(Context.Style.WindowForeground)));
+                Context.CurrentWindow.DrawCommands.Add(new DrawTextCommand($" {title.StripHash()} ", sf.ScreenPos! + new Vec2 { X = (sf.Size!.X - title.Length) / 2, Y = -1 }, new ElementProperties().SetBg(Style.WindowBackground).SetFg(Style.WindowForeground)));
         }
         else
         {
-            Context.AddDrawCommand(new DrawFillCommand(sf.ScreenPos!, sf.Size!, Context.Style.WindowBackground));
+            Context.AddDrawCommand(new DrawFillCommand(sf.ScreenPos!, sf.Size!, Style.WindowBackground));
             if (flags.HasFlag(WindowFlags.HasMenu))
-                Context.AddDrawCommand(new DrawFillCommand(sf.ScreenPos!, new Vec2 { X = sf.Size!.X, Y = 1}, Context.Style.MenuBackground));
+                Context.AddDrawCommand(new DrawFillCommand(sf.ScreenPos!, new Vec2 { X = sf.Size!.X, Y = 1}, Style.MenuBackground));
         }
     }
     public static void End()

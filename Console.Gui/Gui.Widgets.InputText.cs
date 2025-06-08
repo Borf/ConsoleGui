@@ -13,18 +13,29 @@ public static partial class Gui
 {
     public static bool InputText(string label, bool big, ref string value)
     {
+        if (!Context.NextFrameProperties.SameLine)
+            Context.SetLastCursor(new Vec2 { X = 0, Y = (Context.CascadedStackFrame.Cursor?.Y ?? 0) + Context.CascadedStackFrame.LastHeight }, 0);
+
+
         Context.PushId(label);
         bool focussed = HandleFocus();
-
-
-
         var sf = Context.CascadedStackFrame;
         var activationState = GetComponentActivationState();
-        var color = Context.Style.InputCenter;
+        var color = Style.InputCenter;
         var state = Context.GetComponentState<TextInputState>(sf.Id);
 
-        var textViewX = sf.ScreenPos.X + 30 + (big ? 2 : 1);
-        int textViewSize = sf.Size.X - 30 - (big ? 4 : 2);
+        if (state.Cursor > value.Length)
+            state.Cursor = value.Length;
+        else if(state.CursorSelection > value.Length)
+            state.CursorSelection = value.Length;
+
+        int labelLength = 30;
+        label = label.StripHash();
+        if (label.Length == 0)
+            labelLength = 0;
+
+        var textViewX = sf.ScreenPos.X + labelLength + (big ? 2 : 1);
+        int textViewSize = sf.Size.X - labelLength - (big ? 4 : 2);
 
         if (focussed)
         {
@@ -97,6 +108,7 @@ public static partial class Gui
                         {
                             state.Cursor--;
                             value = value[0..state.Cursor] + value[(state.Cursor + 1)..];
+                            state.CursorSelection = state.Cursor;
                         }
                         break;
                     case Key.Delete:
@@ -110,62 +122,64 @@ public static partial class Gui
 
 
         if (focussed)
-            color = Context.Style.InputSelected;
+            color = Style.InputSelected;
         else if (activationState == ComponentActivationState.Hovered)
-            color = Context.Style.InputHovered;
+            color = Style.InputHovered;
         else //if (state == ComponentActivationState.Idle)
-            color = Context.Style.InputCenter;
-        Context.AddDrawCommand(new DrawTextCommand(label, sf.ScreenPos + sf.Cursor + new Vec2 { X = 0, Y = big?1:0 }, new ElementProperties().SetBg(Context.Style.WindowBackground).SetFg(Context.Style.InputText)));
+            color = Style.InputCenter;
+
+        if(labelLength > 0)
+            Context.AddDrawCommand(new DrawTextCommand(label, sf.ScreenPos + sf.Cursor + new Vec2 { X = 0, Y = big?1:0 }, new ElementProperties().SetBg(Style.WindowBackground).SetFg(Style.InputText)));
 
 
         if(focussed)
         {
-            Context.MouseFocus = sf.ScreenPos + sf.Cursor + new Vec2 { X = 30 + state.Cursor + (big ? 2 : 1), Y = big ? 1 : 0 };
+            Context.MouseFocus = sf.ScreenPos + sf.Cursor + new Vec2 { X = labelLength + state.Cursor + (big ? 2 : 1), Y = big ? 1 : 0 };
         }
 
 
         if (big)
         {
-            Context.LastStackFrame.BackgroundColor = Context.Style.InputCenter;
-            Context.LastStackFrame.ForegroundColor = focussed ? Context.Style.InputBorderSelected : Context.Style.InputBorder;
+            Context.LastStackFrame.BackgroundColor = Style.InputCenter;
+            Context.LastStackFrame.ForegroundColor = focussed ? Style.InputBorderSelected : Style.InputBorder;
 
-            Context.AddDrawCommand(new DrawBorderCommand(sf.ScreenPos + sf.Cursor + new Vec2 { X = 30, Y = 0}, new Vec2 { X = textViewSize+4, Y = 3 }, DrawBorderCommand.BorderType.Round));
+            Context.AddDrawCommand(new DrawBorderCommand(sf.ScreenPos + sf.Cursor + new Vec2 { X = labelLength, Y = 0}, new Vec2 { X = textViewSize+4, Y = 3 }, DrawBorderCommand.BorderType.Round));
 
             if(state.Cursor == state.CursorSelection) // no selection
-                Context.AddDrawCommand(new DrawTextCommand(value, sf.ScreenPos + sf.Cursor + new Vec2 { X = 32, Y = 1 }, new ElementProperties().SetBg(color).SetFg(Context.Style.InputText)));
+                Context.AddDrawCommand(new DrawTextCommand(value, sf.ScreenPos + sf.Cursor + new Vec2 { X = labelLength+2, Y = 1 }, new ElementProperties().SetBg(color).SetFg(Style.InputText)));
             else
             {
                 var pre = value[0..Math.Min(state.CursorSelection, state.Cursor)];
                 var selection = value[Math.Min(state.CursorSelection, state.Cursor)..Math.Max(state.CursorSelection, state.Cursor)];
                 var post = value[Math.Max(state.CursorSelection, state.Cursor)..];
 
-                Context.AddDrawCommand(new DrawTextCommand(pre, sf.ScreenPos + sf.Cursor + new Vec2 { X = 32, Y = 1 }, new ElementProperties().SetBg(color).SetFg(Context.Style.InputText)));
-                Context.AddDrawCommand(new DrawTextCommand(selection, sf.ScreenPos + sf.Cursor + new Vec2 { X = 32 + pre.Length, Y = 1 }, new ElementProperties().SetBg(Context.Style.InputText).SetFg(color)));
-                Context.AddDrawCommand(new DrawTextCommand(post, sf.ScreenPos + sf.Cursor + new Vec2 { X = 32 + pre.Length + selection.Length, Y = 1 }, new ElementProperties().SetBg(color).SetFg(Context.Style.InputText)));
+                Context.AddDrawCommand(new DrawTextCommand(pre, sf.ScreenPos + sf.Cursor + new Vec2 { X = labelLength+2, Y = 1 }, new ElementProperties().SetBg(color).SetFg(Style.InputText)));
+                Context.AddDrawCommand(new DrawTextCommand(selection, sf.ScreenPos + sf.Cursor + new Vec2 { X = labelLength+2 + pre.Length, Y = 1 }, new ElementProperties().SetBg(Style.InputText).SetFg(color)));
+                Context.AddDrawCommand(new DrawTextCommand(post, sf.ScreenPos + sf.Cursor + new Vec2 { X = labelLength+2 + pre.Length + selection.Length, Y = 1 }, new ElementProperties().SetBg(color).SetFg(Style.InputText)));
 
 
             }
         }
         else
         {
-            var textColor = focussed ? Context.Style.InputBorderSelected : Context.Style.InputBorder;
-            Context.AddDrawCommand(new DrawTextCommand($"▏{new string(' ', textViewSize)}▕", sf.ScreenPos + sf.Cursor + new Vec2 { X = 30, Y = 0 }, new ElementProperties().SetBg(color).SetFg(textColor).SetUnderLine().SetOverLine()));
+            var textColor = focussed ? Style.InputBorderSelected : Style.InputBorder;
+            Context.AddDrawCommand(new DrawTextCommand($"▏{new string(' ', textViewSize)}▕", sf.ScreenPos + sf.Cursor + new Vec2 { X = labelLength, Y = 0 }, new ElementProperties().SetBg(color).SetFg(textColor).SetUnderLine().SetOverLine()));
             if (state.Cursor == state.CursorSelection) // no selection
-                Context.AddDrawCommand(new DrawTextCommand($"{value}", sf.ScreenPos + sf.Cursor + new Vec2 { X = 31, Y = 0 }, new ElementProperties().SetBg(color).SetFg(textColor).SetUnderLine().SetOverLine()));
+                Context.AddDrawCommand(new DrawTextCommand($"{value}", sf.ScreenPos + sf.Cursor + new Vec2 { X = labelLength+1, Y = 0 }, new ElementProperties().SetBg(color).SetFg(textColor).SetUnderLine().SetOverLine()));
             else
             {
                 var pre = value[0..Math.Min(state.CursorSelection, state.Cursor)];
                 var selection = value[Math.Min(state.CursorSelection, state.Cursor)..Math.Max(state.CursorSelection, state.Cursor)];
                 var post = value[Math.Max(state.CursorSelection, state.Cursor)..];
 
-                Context.AddDrawCommand(new DrawTextCommand(pre, sf.ScreenPos + sf.Cursor + new Vec2 { X = 31, Y = 0 }, new ElementProperties().SetBg(color).SetFg(textColor).SetUnderLine().SetOverLine()));
-                Context.AddDrawCommand(new DrawTextCommand(selection, sf.ScreenPos + sf.Cursor + new Vec2 { X = 31+pre.Length, Y = 0 }, new ElementProperties().SetBg(textColor).SetFg(color).SetUnderLine().SetOverLine()));
-                Context.AddDrawCommand(new DrawTextCommand(post, sf.ScreenPos + sf.Cursor + new Vec2 { X = 31+pre.Length+selection.Length, Y = 0 }, new ElementProperties().SetBg(color).SetFg(textColor).SetUnderLine().SetOverLine()));
+                Context.AddDrawCommand(new DrawTextCommand(pre, sf.ScreenPos + sf.Cursor + new Vec2 { X = labelLength+1, Y = 0 }, new ElementProperties().SetBg(color).SetFg(textColor).SetUnderLine().SetOverLine()));
+                Context.AddDrawCommand(new DrawTextCommand(selection, sf.ScreenPos + sf.Cursor + new Vec2 { X = labelLength +1+ pre.Length, Y = 0 }, new ElementProperties().SetBg(textColor).SetFg(color).SetUnderLine().SetOverLine()));
+                Context.AddDrawCommand(new DrawTextCommand(post, sf.ScreenPos + sf.Cursor + new Vec2 { X = labelLength +1+ pre.Length+selection.Length, Y = 0 }, new ElementProperties().SetBg(color).SetFg(textColor).SetUnderLine().SetOverLine()));
             }
         }
 
         Context.PopId();
-        Context.LastStackFrame.Cursor += new Vec2 { X = 0, Y = big ? 3 : 1 };
+        Context.SetLastCursor(new Vec2 { X = sf.Cursor.X + sf.Size.X, Y = sf.Cursor.Y }, big ? 3 : 1);
         return false;
     }
 

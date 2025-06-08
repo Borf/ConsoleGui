@@ -16,8 +16,8 @@ public static partial class Gui
         var parentSf = Context.CascadedStackFrame;
         Context.NextFrameProperties.Size = parentSf.Size + new Vec2 { X = 1, Y = 2 };
         Context.NextFrameProperties.ScreenPos = parentSf.ScreenPos + new Vec2 { X = -1, Y = 0 };
-        SetNextBackgroundColorDefault(Context.Style.ListBackground);
-        SetNextForegroundColorDefault(Context.Style.ListOutline);
+        SetNextBackgroundColorDefault(Style.ListBackground);
+        SetNextForegroundColorDefault(Style.ListOutline);
         Context.PushId(name);
         var state = Context.GetComponentState<ListState>(Context.CurrentId);
         state.CurrentIndex = 0;
@@ -58,12 +58,12 @@ public static partial class Gui
 
 
 
-        var props = new ElementProperties().SetBg(Context.Style.ListBackground).SetFg(Context.Style.ListOutline);
+        var props = new ElementProperties().SetBg(Style.ListBackground).SetFg(Style.ListOutline);
         if (listState.SelectedIndex == listState.CurrentIndex)
         {
             if (whenEvent == ListChangedEvent.Continuous)
                 ret = true;
-            props.SetBg(Context.Style.ListSelectionBackground).SetFg(Context.Style.ListSelectionText);
+            props.SetBg(Style.ListSelectionBackground).SetFg(Style.ListSelectionText);
         }
 
 
@@ -96,14 +96,14 @@ public static partial class Gui
         int barHeight = Math.Max(1, scrollbarHeight * pageHeight / scrollHeight);
         int barY = 1 + (listState.ScrollOffset * (scrollbarHeight - barHeight)) / scrollRange;
 
-        Context.AddDrawCommand(new DrawTextCommand("↑", sf.ScreenPos + new Vec2 { X = sf.Size.X - 3, Y = 0 }, new ElementProperties().SetBg(Context.Style.ListScrollbar).SetFg(Context.Style.ListOutline)));
+        Context.AddDrawCommand(new DrawTextCommand("↑", sf.ScreenPos + new Vec2 { X = sf.Size.X - 3, Y = 0 }, new ElementProperties().SetBg(Style.ListScrollbar).SetFg(Style.ListOutline)));
         for(int i = 1; i < sf.Size.Y-3; i++)
-            Context.AddDrawCommand(new DrawTextCommand("░", sf.ScreenPos + new Vec2 { X = sf.Size.X - 3, Y = i }, new ElementProperties().SetBg(Context.Style.ListScrollbar).SetFg(Context.Style.ListOutline)));
+            Context.AddDrawCommand(new DrawTextCommand("░", sf.ScreenPos + new Vec2 { X = sf.Size.X - 3, Y = i }, new ElementProperties().SetBg(Style.ListScrollbar).SetFg(Style.ListOutline)));
 
-        Context.AddDrawCommand(new DrawTextCommand("↓", sf.ScreenPos + new Vec2 { X = sf.Size.X - 3, Y = sf.Size.Y-3 }, new ElementProperties().SetBg(Context.Style.ListScrollbar).SetFg(Context.Style.ListOutline)));
+        Context.AddDrawCommand(new DrawTextCommand("↓", sf.ScreenPos + new Vec2 { X = sf.Size.X - 3, Y = sf.Size.Y-3 }, new ElementProperties().SetBg(Style.ListScrollbar).SetFg(Style.ListOutline)));
 
         for(int i = barY; i < barY + barHeight; i++)
-            Context.AddDrawCommand(new DrawTextCommand("▓", sf.ScreenPos + new Vec2 { X = sf.Size.X - 3, Y = i }, new ElementProperties().SetBg(Context.Style.ListScrollbar).SetFg(Context.Style.ListScrollbarTracker)));
+            Context.AddDrawCommand(new DrawTextCommand("▓", sf.ScreenPos + new Vec2 { X = sf.Size.X - 3, Y = i }, new ElementProperties().SetBg(Style.ListScrollbar).SetFg(Style.ListScrollbarTracker)));
 
         Context.PopId();
     }
@@ -113,7 +113,7 @@ public static partial class Gui
 
 public class ListState : ComponentState
 {
-    public int SelectedIndex { get; set; } = 0;
+    public int SelectedIndex { get; set; } = -1;
     public int ScrollOffset { get; set; } = 0;
     public int CurrentIndex { get; set; } = 0;
     public int MaxIndex { get; set; } = 0;

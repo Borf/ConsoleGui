@@ -12,19 +12,22 @@ public static partial class Gui
 {
     public static bool Button(string text, bool big)
     {
+        if (!Context.NextFrameProperties.SameLine)
+            Context.SetLastCursor(new Vec2 { X = 0, Y = (Context.CascadedStackFrame.Cursor?.Y ?? 0) + Context.CascadedStackFrame.LastHeight }, 0);
+
 
         var state = GetComponentActivationState(text);
 
 
         if (state == ComponentActivationState.Hovered)
-            SetNextBackgroundColorDefault(Context.Style.ButtonCenter.Darker());
+            SetNextBackgroundColorDefault(Style.ButtonCenter.Darker());
         else if (state == ComponentActivationState.Pressed || state == ComponentActivationState.Down)
-            SetNextBackgroundColorDefault(Context.Style.ButtonCenter.Lighter().Lighter());
+            SetNextBackgroundColorDefault(Style.ButtonCenter.Lighter().Lighter());
         else
-            SetNextBackgroundColorDefault(Context.Style.ButtonCenter);
+            SetNextBackgroundColorDefault(Style.ButtonCenter);
 
-        SetNextForegroundColor(Context.Style.ButtonText);
-        SetNextTextColor(Context.Style.ButtonText);
+        SetNextForegroundColor(Style.ButtonText);
+        SetNextTextColor(Style.ButtonText);
 
         Context.PushId(text);
 
@@ -35,18 +38,20 @@ public static partial class Gui
             if (big)
                 Context.LastStackFrame.Size = new Vec2 { X = text.Length + 4, Y = 3 };
 
+        int size = Context.LastStackFrame.Size.X;
+
         if (big)
         {
             Context.AddDrawCommand(new DrawBorderCommand(sf.ScreenPos + sf.Cursor, Context.LastStackFrame.Size, DrawBorderCommand.BorderType.Round));
-            Context.AddDrawCommand(new DrawTextCommand(text, sf.ScreenPos + sf.Cursor + new Vec2 { X = (Context.LastStackFrame.Size.X - text.Length)/2, Y = 1 }, new ElementProperties().SetBg(sf.BackgroundColor.Value).SetFg(Context.Style.ButtonText)));
+            Context.AddDrawCommand(new DrawTextCommand(text, sf.ScreenPos + sf.Cursor + new Vec2 { X = (Context.LastStackFrame.Size.X - text.Length)/2, Y = 1 }, new ElementProperties().SetBg(sf.BackgroundColor.Value).SetFg(Style.ButtonText)));
         }
         else
         {
-            Context.AddDrawCommand(new DrawTextCommand($"▏{text}▕", sf.ScreenPos + sf.Cursor, new ElementProperties().SetBg(sf.BackgroundColor.Value).SetFg(Context.Style.ButtonText).SetUnderLine().SetOverLine()));
+            Context.AddDrawCommand(new DrawTextCommand($"▏{text}▕", sf.ScreenPos + sf.Cursor, new ElementProperties().SetBg(sf.BackgroundColor.Value).SetFg(Style.ButtonText).SetUnderLine().SetOverLine()));
         }
 
         Context.PopId();
-        Context.LastStackFrame.Cursor += new Vec2 { X = 0, Y = big ? 3 : 1 };
+        Context.SetLastCursor(new Vec2 { X = sf.Cursor.X + size, Y = sf.Cursor.Y }, big ? 3 : 1);
         return state == ComponentActivationState.Released;
     }
 
