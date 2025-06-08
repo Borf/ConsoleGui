@@ -35,9 +35,9 @@ public static partial class Gui
 
 
         if (Context.LastStackFrame.Size == null)
-            if (big)
-                Context.LastStackFrame.Size = new Vec2 { X = text.Length + 4, Y = 3 };
-
+            Context.LastStackFrame.Size = new Vec2 { X = text.Length + (big ? 4 : 2), Y = big ? 3 : 1 };
+        if(Context.LastStackFrame.Size.Y == 0)
+            Context.LastStackFrame.Size = new Vec2 { X = Context.LastStackFrame.Size.X, Y = big ? 3 : 1 };
         int size = Context.LastStackFrame.Size.X;
 
         if (big)
