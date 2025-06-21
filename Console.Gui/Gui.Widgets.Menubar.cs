@@ -31,11 +31,11 @@ public static partial class Gui
 
         Context.PushId(value);
 
-        if (Context.MouseStates[0].HasFlag(MouseState.Pressed))
+        if (Context.MouseStates[0].HasFlag(MouseState.JustPressed))
             if (!Context.HoveredComponent.StartsWith(menuId) && !Context.HoveredComponent.Contains("#menuPopup")) //hardcoded meh
                 menuState.OpenedId = string.Empty;
 
-        if (Context.MouseStates[0].HasFlag(MouseState.Pressed))
+        if (Context.MouseStates[0].HasFlag(MouseState.JustPressed))
             if (Context.HoveredComponent == Context.CurrentId)
                 menuState.OpenedId = Context.CurrentId;
 

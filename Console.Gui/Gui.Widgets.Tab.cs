@@ -45,7 +45,7 @@ public static partial class Gui
 
 
         if (Context.HoveredComponent == Context.CurrentId && 
-            Context.MouseStates[0] == MouseState.Pressed && 
+            Context.MouseStates[0] == MouseState.JustPressed && 
             Context.MousePos.Y == Context.LastStackFrame.ScreenPos.Y &&
             Context.MousePos.X > tabPane.ScreenPos.X + tabPane.Cursor.X &&
             Context.MousePos.X < tabPane.ScreenPos.X + Context.LastStackFrame.Cursor.X)

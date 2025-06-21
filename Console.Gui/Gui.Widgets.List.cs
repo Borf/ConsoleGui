@@ -49,7 +49,7 @@ public static partial class Gui
 
         Context.PushId(text);
         var sf = Context.CascadedStackFrame;
-        if (Context.HoveredComponent == sf.Id && Context.MouseStates[0] == MouseState.Pressed)
+        if (Context.HoveredComponent == sf.Id && Context.MouseStates[0] == MouseState.JustPressed)
         {
             listState.SelectedIndex = listState.CurrentIndex;
             if(whenEvent == ListChangedEvent.OnSelect)

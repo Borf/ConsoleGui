@@ -79,7 +79,6 @@ public static partial class Gui
             foreach (Match match in matches)
             {
                 string code = match.Groups[1].Value;
-                //Debug.WriteLine(code);
                 if (code.StartsWith("1;"))
                 {
                     char key = code[2]; // 2 = shift, 3 = alt, 5 = ctrl
@@ -181,17 +180,17 @@ public static partial class Gui
         {
             if (pressState[i])
             {
-                if (Context.MouseStates[i] == MouseState.Pressed)
+                if (Context.MouseStates[i] == MouseState.JustPressed)
                     Context.MouseStates[i] = MouseState.Down;
-                else if (Context.MouseStates[i] == MouseState.Up)
-                    Context.MouseStates[i] = MouseState.Pressed;
+                else if (Context.MouseStates[i] != MouseState.Down)
+                    Context.MouseStates[i] = MouseState.JustPressed;
             }
             else //!pressed
             {
-                if (Context.MouseStates[i] == MouseState.Down)
-                    Context.MouseStates[i] = MouseState.Released;
-                else if (Context.MouseStates[i] == MouseState.Released)
+                if (Context.MouseStates[i] == MouseState.JustReleased)
                     Context.MouseStates[i] = MouseState.Up;
+                else if (Context.MouseStates[i] != MouseState.Up)
+                    Context.MouseStates[i] = MouseState.JustReleased;
             }
         }
 
@@ -276,11 +275,11 @@ public static partial class Gui
         if (Context.HoveredComponent == id)
         {
             state = ComponentActivationState.Hovered;
-            if (Context.MouseStates[0] == MouseState.Pressed)
+            if (Context.MouseStates[0] == MouseState.JustPressed)
                 state = ComponentActivationState.Pressed;
             if (Context.MouseStates[0] == MouseState.Down)
                 state = ComponentActivationState.Down;
-            if (Context.MouseStates[0] == MouseState.Released)
+            if (Context.MouseStates[0] == MouseState.JustReleased)
                 state = ComponentActivationState.Released;
         }
         //TODO: add selected state
@@ -290,7 +289,7 @@ public static partial class Gui
 
     private static bool HandleFocus()
     {
-        if(Context.MouseStates[0] == MouseState.Pressed)
+        if(Context.MouseStates[0] == MouseState.JustPressed)
         {
             if (Context.HoveredComponent == Context.CurrentId)
                 Context.FocussedComponent = Context.CurrentId;

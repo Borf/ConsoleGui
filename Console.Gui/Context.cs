@@ -80,8 +80,8 @@ public enum MouseState
 {
     Up,
     Down,
-    Pressed,
-    Released,
+    JustPressed,
+    JustReleased,
 }
 
 public enum Key
