@@ -64,7 +64,7 @@ public static partial class Gui
 //        while(!Console.KeyAvailable)
 //           Thread.Sleep(1);
 
-
+        //TODO: should this be in a seperate thread from the rendering thread?
         var result = "";
         while (Console.KeyAvailable)
         {

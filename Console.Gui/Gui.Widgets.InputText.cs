@@ -172,9 +172,9 @@ public static partial class Gui
                 var selection = value[Math.Min(state.CursorSelection, state.Cursor)..Math.Max(state.CursorSelection, state.Cursor)];
                 var post = value[Math.Max(state.CursorSelection, state.Cursor)..];
 
-                Context.AddDrawCommand(new DrawTextCommand(pre, sf.ScreenPos + sf.Cursor + new Vec2 { X = labelLength+1, Y = 0 }, new ElementProperties().SetBg(color).SetFg(textColor).SetUnderLine().SetOverLine()));
-                Context.AddDrawCommand(new DrawTextCommand(selection, sf.ScreenPos + sf.Cursor + new Vec2 { X = labelLength +1+ pre.Length, Y = 0 }, new ElementProperties().SetBg(textColor).SetFg(color).SetUnderLine().SetOverLine()));
-                Context.AddDrawCommand(new DrawTextCommand(post, sf.ScreenPos + sf.Cursor + new Vec2 { X = labelLength +1+ pre.Length+selection.Length, Y = 0 }, new ElementProperties().SetBg(color).SetFg(textColor).SetUnderLine().SetOverLine()));
+                Context.AddDrawCommand(new DrawTextCommand(pre, sf.ScreenPos + sf.Cursor + new Vec2 { X = labelLength + 1, Y = 0 }, new ElementProperties().SetBg(color).SetFg(textColor).SetUnderLine().SetOverLine()));
+                Context.AddDrawCommand(new DrawTextCommand(selection, sf.ScreenPos + sf.Cursor + new Vec2 { X = labelLength + 1 + pre.Length, Y = 0 }, new ElementProperties().SetBg(textColor).SetFg(color).SetUnderLine().SetOverLine()));
+                Context.AddDrawCommand(new DrawTextCommand(post, sf.ScreenPos + sf.Cursor + new Vec2 { X = labelLength + 1 + pre.Length + selection.Length, Y = 0 }, new ElementProperties().SetBg(color).SetFg(textColor).SetUnderLine().SetOverLine()));
             }
         }
 

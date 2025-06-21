@@ -68,6 +68,7 @@ public class FrameBuffer
         for (int y = 0; y < Height; y++)
         {
             var begin = 0;
+            screenBuffer.Append($"\x1b[{y+1};{0}H");
             for (int x = 0; x < Width; x++)
             {
                 var current = Elements[x, y];
@@ -90,9 +91,23 @@ public class FrameBuffer
                 sb.Append(current.Character);
                 last = current;
             }
+
+            {
+                ANSIString str = new ANSIString(sb.ToString());
+                if (last.Properties.FgColor.HasValue)
+                    str = str.Color(last.Properties.FgColor.Value);
+                if (last.Properties.BgColor.HasValue)
+                    str = str.Background(last.Properties.BgColor.Value);
+                if (last.Properties.UnderLine.HasValue && last.Properties.UnderLine.Value == true)
+                    str = str.Underlined();
+                if (last.Properties.OverLine.HasValue && last.Properties.OverLine.Value == true)
+                    str = str.Overlined();
+                screenBuffer.Append(str);
+                sb.Clear();
+            }
         }
         //Console.SetCursorPosition(0, 0);
-        Console.Write("\x1b[0;0H");
+        //Console.Write("\x1b[0;0H");
         Console.Write(screenBuffer);
     }
 }

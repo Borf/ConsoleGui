@@ -15,7 +15,7 @@ public class DrawTextCommand : DrawCommand
 
     public DrawTextCommand(string text, Vec2 pos, ElementProperties properties)
     {
-        this.text = text;
+        this.text = text.Normalize();
         this.pos = pos;
         this.properties = properties;
     }

@@ -66,9 +66,7 @@ public static partial class Gui
             props.SetBg(Style.ListSelectionBackground).SetFg(Style.ListSelectionText);
         }
 
-
-
-        Context.AddDrawCommand(new DrawTextCommand(text, sf.ScreenPos + sf.Cursor, props));
+        Context.AddDrawCommand(new DrawTextCommand(text.PadLength(sf.Size.X-2), sf.ScreenPos + sf.Cursor, props));
 
 
 
@@ -93,7 +91,7 @@ public static partial class Gui
 
         // Avoid division by zero
         int scrollRange = Math.Max(1, scrollHeight - pageHeight);
-        int barHeight = Math.Max(1, scrollbarHeight * pageHeight / scrollHeight);
+        int barHeight = Math.Clamp(scrollbarHeight * pageHeight / scrollHeight, 1, scrollbarHeight);
         int barY = 1 + (listState.ScrollOffset * (scrollbarHeight - barHeight)) / scrollRange;
 
         Context.AddDrawCommand(new DrawTextCommand("↑", sf.ScreenPos + new Vec2 { X = sf.Size.X - 3, Y = 0 }, new ElementProperties().SetBg(Style.ListScrollbar).SetFg(Style.ListOutline)));
