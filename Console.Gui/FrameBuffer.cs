@@ -112,12 +112,11 @@ public class ElementProperties
     public bool? UnderLine { get; set; }
     public bool? OverLine { get; set; }
     public bool? Bold { get; set; }
-
     public override bool Equals(object? obj)
-    {
+    {//TODO: this costs performance apparently
         return obj is ElementProperties properties &&
-               BgColor.Equals(properties.BgColor) &&
-               FgColor.Equals(properties.FgColor) &&
+               BgColor?.ToArgb() == properties?.BgColor?.ToArgb() &&
+               FgColor?.ToArgb() == properties?.FgColor?.ToArgb() &&
                UnderLine == properties.UnderLine &&
                OverLine == properties.OverLine &&
                Bold == properties.Bold;
