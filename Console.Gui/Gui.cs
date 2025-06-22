@@ -256,10 +256,6 @@ public static partial class Gui
         // we are C#, we don't need to dispose of things
     }
 
-    public static bool CheckBox(string label, ref bool value)
-    {
-        return false;
-    }
 
     public static void SameLine()
     {

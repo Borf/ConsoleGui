@@ -25,7 +25,7 @@ public class Style
     public static Color PrimaryText = ColorTranslator.FromHtml("#6EA8FE");
 
     public static Color Success = ColorTranslator.FromHtml("#198754");
-    public static Color SuccessSubtle = ColorTranslator.FromHtml("#051B11");
+    public static Color SuccessSubtle = ColorTranslator.FromHtml("#051A10");
     public static Color SuccessBorder = ColorTranslator.FromHtml("#0F5132");
     public static Color SuccessText = ColorTranslator.FromHtml("#75B798");
 
@@ -80,4 +80,11 @@ public class Style
     public Color ComboBoxbackground { get; set; } = Info;
     public Color ComboBoxButtonBackground { get; set; } = Primary;
     public Color ComboBoxText { get; set; } = Dark;
+    
+    
+    public Color CheckboxBackground { get; set; } = SuccessBorder;
+    public Color CheckboxText { get; set; } = Front;
+
+
+    
 }
