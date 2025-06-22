@@ -77,4 +77,7 @@ public class Style
     public Color ListSelectionText { get; set; } = Dark;
     public Color ListSelectionBackground { get; set; } = Info;
 
+    public Color ComboBoxbackground { get; set; } = Info;
+    public Color ComboBoxButtonBackground { get; set; } = Primary;
+    public Color ComboBoxText { get; set; } = Dark;
 }

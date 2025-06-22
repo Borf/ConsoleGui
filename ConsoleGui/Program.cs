@@ -6,8 +6,11 @@ using System.Diagnostics;
 Gui.CreateContext();
 
 string text = "Hello";
+string[] comboValues = ["Value 1", "Value 2", "Value 3", "Value 4", "Value 5"];
+string comboValue = "Click me!";
 
-while(true)
+
+while (true)
 {
     Gui.BeginFrame();
 
@@ -74,6 +77,14 @@ while(true)
                 if (Gui.InputText("Position 2", false, ref text))
                 {
                     Debug.WriteLine("Text Changed!");
+                }
+
+                if(Gui.BeginComboBox("Combo!", comboValue))
+                {
+                    foreach(var entry in comboValues)
+                        if (Gui.ComboBoxEntry(entry, entry == comboValue))
+                            comboValue = entry;
+                    Gui.EndComboBox();
                 }
 
 
