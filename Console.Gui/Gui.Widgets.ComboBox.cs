@@ -25,10 +25,15 @@ public static partial class Gui
         var state = Context.GetComponentState<ComboboxState>(sf.Id);
 
 
-        if(activationState == ComponentActivationState.Pressed)
+        if (Context.MouseStates[0].HasFlag(MouseState.JustPressed))
+            if (activationState == ComponentActivationState.Idle && !Context.HoveredComponent.Contains("#comboBoxPopup")) //hardcoded meh
+                state.Opened = false;
+
+        if (activationState == ComponentActivationState.Pressed)
         {
             state.Opened = !state.Opened;
         }
+
 
         int labelLength = 30;
         label = label.StripHash();
@@ -38,9 +43,9 @@ public static partial class Gui
         if (labelLength > 0)
             Context.AddDrawCommand(new DrawTextCommand(label, sf.ScreenPos + sf.Cursor, new ElementProperties().SetBg(Style.WindowBackground).SetFg(Style.InputText)));
 
-        int width = Context.LastStackFrame.Size?.X ?? value.Length + 1;
-        Context.AddDrawCommand(new DrawTextCommand(value + "   ", sf.ScreenPos + sf.Cursor + new Vec2 { X = labelLength, Y = 0 }, new ElementProperties().SetBg(Style.ComboBoxbackground).SetFg(sf.TextColor.Value)));
-        Context.AddDrawCommand(new DrawTextCommand(" ↓ ", sf.ScreenPos + sf.Cursor + new Vec2 { X = labelLength + value.Length+1, Y = 0 }, new ElementProperties().SetBg(Style.ComboBoxButtonBackground).SetFg(sf.TextColor.Value)));
+        int width = Context.LastStackFrame.Size?.X ?? value.Length + 4;
+        Context.AddDrawCommand(new DrawTextCommand(value.PadLength(width-3) + "   ", sf.ScreenPos + sf.Cursor + new Vec2 { X = labelLength, Y = 0 }, new ElementProperties().SetBg(Style.ComboBoxbackground).SetFg(sf.TextColor.Value)));
+        Context.AddDrawCommand(new DrawTextCommand(" ↓ ", sf.ScreenPos + sf.Cursor + new Vec2 { X = labelLength + width-3, Y = 0 }, new ElementProperties().SetBg(Style.ComboBoxButtonBackground).SetFg(sf.TextColor.Value)));
 
         if (state.Opened)
         {
