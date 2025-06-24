@@ -256,7 +256,11 @@ public static partial class Gui
         // we are C#, we don't need to dispose of things
     }
 
-
+    public static void NewLine()
+    {
+        var sf = Context.CascadedStackFrame;
+        Context.SetLastCursor(new Vec2 { X = sf.Cursor.X, Y = sf.Cursor.Y + sf.LastHeight }, 1);
+    }
     public static void SameLine()
     {
         Context.NextFrameProperties.SameLine = true;
