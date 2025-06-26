@@ -205,11 +205,21 @@ public static partial class Gui
 
     public static void Render()
     {
+        GeneratePopups();
+
         var frameBuffer = new FrameBuffer(Console.WindowWidth, Console.WindowHeight);
 
-        foreach (var window in Context.Windows) //TODO: order by window order
+        bool hasModal = Context.Windows.Any(w => w.Modal);
+        if (hasModal)
+            frameBuffer.Darken = true;
+        foreach (var window in Context.Windows.Where(w => !w.Modal))
             foreach(var drawCommand in window.DrawCommands)
                 drawCommand.Draw(frameBuffer);
+        frameBuffer.Darken = false;
+        foreach (var window in Context.Windows.Where(w => w.Modal))
+            foreach (var drawCommand in window.DrawCommands)
+                drawCommand.Draw(frameBuffer);
+
 
 
         //debug info
@@ -250,10 +260,39 @@ public static partial class Gui
         Thread.Sleep(1);
     }
 
-
     public static void DestroyContext()
     {
         // we are C#, we don't need to dispose of things
+    }
+
+
+    public static void Confirm(string message, Action callback)
+    {
+        Context.ConfirmMessage = message;
+        Context.ConfirmCallback = callback;
+    }
+
+    public static void Progress(string message)
+    {
+        Context.ProgressMessage = message;
+        Context.ProgressPercent = 0;
+    }
+    public static void ProgressDone()
+    {
+        Context.ProgressMessage = string.Empty;
+        Context.ProgressPercent = 0;
+    }
+    public static void ProgressReport(float percentage, string message = "")
+    {
+        if(!string.IsNullOrEmpty(message))
+            Context.ProgressMessage = message;
+        Context.ProgressPercent = percentage;
+    }
+
+
+    public static void MessageBox(string message)
+    {
+        Context.PopupMessage = message;
     }
 
     public static void NewLine()
@@ -261,9 +300,15 @@ public static partial class Gui
         var sf = Context.CascadedStackFrame;
         Context.SetLastCursor(new Vec2 { X = sf.Cursor.X, Y = sf.Cursor.Y + sf.LastHeight }, 1);
     }
-    public static void SameLine()
+    public static void SameLine(int spacing = 0)
     {
         Context.NextFrameProperties.SameLine = true;
+        if (spacing > 0)
+        {
+            var sf = Context.CascadedStackFrame;
+            Context.SetLastCursor(new Vec2 { X = sf.Cursor.X+ spacing, Y = sf.Cursor.Y }, sf.LastHeight);
+
+        }
     }
 
     private static ComponentActivationState GetComponentActivationState(string? suffix = null)
@@ -300,6 +345,9 @@ public static partial class Gui
     }
 
 
+    public static Vec2 CurrentSize => Context.CascadedStackFrame.Size ?? Vec2.Zero;
+
+
     public static void PushId(string id) => Context.PushId(id);
     public static void PopId() => Context.PopId();
 
@@ -322,6 +370,7 @@ public static partial class Gui
     public static void SetNextForegroundColor(Color color) => Context.NextFrameProperties.ForegroundColor = color;
     public static void SetNextTextColor(Color color) => Context.NextFrameProperties.TextColor = color;
     public static void SetNextCursor(Vec2 cursor) => Context.NextFrameProperties.Cursor = cursor;
+    public static void SetNextPosition(Vec2 position) => Context.NextFrameProperties.ScreenPos = position;
 
 
 

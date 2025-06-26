@@ -16,28 +16,27 @@ public enum WindowFlags
     TopWindow = 1 << 0,
     HasMenu = 1 << 1,
     HideBorder = 1 << 2,
+    Modal = 1 << 3
 }
 
 public static partial class Gui
 {
 
-    public static void Begin(string title, WindowFlags flags = 0, Vec2? pos = null, Vec2? size = null, int marginLeft = 0)
+    public static void Begin(string title, WindowFlags flags = 0, int marginLeft = 0)
     {
-        Context.WindowCreationStack.AddLast(new Window() { Id = Context.CurrentId });
+        Context.WindowCreationStack.AddLast(new Window() { Id = Context.CurrentId, Modal = flags.HasFlag(WindowFlags.Modal) });
         Context.Windows.Add(Context?.CurrentWindow ?? throw new Exception("Current window not set"));
 
 
-        if (Context.NextFrameProperties.ScreenPos == null)
+        if (flags.HasFlag(WindowFlags.TopWindow))
         {
-            if (flags.HasFlag(WindowFlags.TopWindow))
-            {
+            if (Context.NextFrameProperties.ScreenPos == null)
                 Context.NextFrameProperties.ScreenPos = new Vec2 { X = 0, Y = 0 };
-                Context.NextFrameProperties.HasBorder = BorderDir.None;
-            }
-            else
-            {
-                Context.NextFrameProperties.HasBorder = BorderDir.Double;
-            }
+            Context.NextFrameProperties.HasBorder = BorderDir.None;
+        }
+        else
+        {
+            Context.NextFrameProperties.HasBorder = BorderDir.Double;
         }
 
         if (Context.NextFrameProperties.Size == null)
@@ -57,16 +56,16 @@ public static partial class Gui
         var sf = Context.CascadedStackFrame;
 
         if(!flags.HasFlag(WindowFlags.TopWindow))
-            Context.LastStackFrame.AddMargin(new Vec2 { X = 1, Y = 1 }, new Vec2 { X = 1, Y = 1 });
+            Context.LastStackFrame.AddMargin(new Vec2 { X = 1 + marginLeft, Y = 1 }, new Vec2 { X = 1, Y = 1 });
         if(flags.HasFlag(WindowFlags.HasMenu))
-            Context.LastStackFrame.AddMargin(new Vec2 { X = 0, Y = 1 }, new Vec2 { X = 0, Y = 0 });
+            Context.LastStackFrame.AddMargin(new Vec2 { X = 0 + marginLeft, Y = 1 }, new Vec2 { X = 0, Y = 0 });
 
         if (!flags.HasFlag(WindowFlags.TopWindow))
         {
             if(!flags.HasFlag(WindowFlags.HideBorder))
                 Context.AddDrawCommand(new DrawBorderCommand(sf.ScreenPos!, sf.Size!, DrawBorderCommand.BorderType.Double));
             if (!string.IsNullOrEmpty(title.StripHash()))
-                Context.CurrentWindow.DrawCommands.Add(new DrawTextCommand($" {title.StripHash()} ", sf.ScreenPos! + new Vec2 { X = (sf.Size!.X - title.Length) / 2, Y = -1 }, new ElementProperties().SetBg(Style.WindowBackground).SetFg(Style.WindowForeground)));
+                Context.CurrentWindow.DrawCommands.Add(new DrawTextCommand($"╡{title.StripHash()}╞", sf.ScreenPos! + new Vec2 { X = (sf.Size!.X - title.Length) / 2, Y = 0 }, new ElementProperties().SetBg(Style.WindowBackground).SetFg(Style.WindowForeground).SetOverLine().SetUnderLine()));
         }
         else
         {

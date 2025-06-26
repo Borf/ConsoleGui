@@ -54,13 +54,13 @@ public static partial class Gui
         if (Context.LastStackFrame.ScreenPos.X + size < tabPane.ScreenPos!.X + tabPane.Size.X)
         {
             for (int ii = 0; ii < tabPane.Size.Y-1; ii++)
-                Context.AddDrawCommand(new DrawTextCommand("║", Context.LastStackFrame.ScreenPos + new Vec2 { X = size, Y = ii }, new ElementProperties()));
+                Context.AddDrawCommand(new DrawTextCommand("║", Context.LastStackFrame.ScreenPos + new Vec2 { X = size, Y = ii }, new ElementProperties().SetFg(Style.WindowForeground)));
 
             if (tabPane.HasBorder.Value.HasFlag(BorderDir.Up))
-                Context.AddDrawCommand(new DrawTextCommand("╦", Context.LastStackFrame.ScreenPos + new Vec2 { X = size, Y = -1 }, new ElementProperties()));
+                Context.AddDrawCommand(new DrawTextCommand("╦", Context.LastStackFrame.ScreenPos + new Vec2 { X = size, Y = -1 }, new ElementProperties().SetFg(Style.WindowForeground)));
 
             if (tabPane.HasBorder.Value.HasFlag(BorderDir.Down))
-                Context.AddDrawCommand(new DrawTextCommand("╩", Context.LastStackFrame.ScreenPos + new Vec2 { X = size, Y = tabPane.Size.Y }, new ElementProperties()));
+                Context.AddDrawCommand(new DrawTextCommand("╩", Context.LastStackFrame.ScreenPos + new Vec2 { X = size, Y = tabPane.Size.Y }, new ElementProperties().SetFg(Style.WindowForeground)));
         }
     }
 

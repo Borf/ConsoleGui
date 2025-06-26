@@ -18,6 +18,12 @@ public class Context
     public StackFrame CascadedStackFrame => CurrentWindow?.CascadedStackFrame ?? throw new Exception("Current window not set");
     public string CurrentId => CurrentWindow?.CurrentId ?? "";
 
+    public string ConfirmMessage { get; set; } = string.Empty;
+    public Action ConfirmCallback { get; set; } = null!;
+    public string PopupMessage { get; set; } = string.Empty;
+
+    public string ProgressMessage { get; set; } = string.Empty;
+    public float ProgressPercent { get; set; } = 0;
 
     public void SetLastCursor(Vec2 cursor, int height)
     {

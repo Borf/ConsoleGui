@@ -38,8 +38,8 @@ public static partial class Gui
 
         //draw the tab header in the context of the panel
         bool selected = state.SelectedTabId == title;
-        Context.AddDrawCommand(new DrawTextCommand(title, tabPane.ScreenPos + new Vec2 { X = tabPane.Cursor.X, Y = 0 }, new ElementProperties().SetBg(selected ? Style.TabSelected : Style.WindowBackground)));
-        Context.AddDrawCommand(new DrawTextCommand("│", tabPane.ScreenPos + new Vec2 { X = tabPane.Cursor.X + title.Length + 1, Y = 0 }, new ElementProperties()));
+        Context.AddDrawCommand(new DrawTextCommand(title, tabPane.ScreenPos + new Vec2 { X = tabPane.Cursor.X, Y = 0 }, new ElementProperties().SetBg(selected ? Style.TabSelected : Style.WindowBackground).SetFg(Style.WindowForeground)));
+        Context.AddDrawCommand(new DrawTextCommand("│", tabPane.ScreenPos + new Vec2 { X = tabPane.Cursor.X + title.Length + 1, Y = 0 }, new ElementProperties().SetFg(Style.WindowForeground)));
         Context.AddDrawCommand(new DrawTextCommand( new string('─', title.Length+2) + "┴", tabPane.ScreenPos + tabPane.Cursor + new Vec2 { X = -1, Y = 1 }, new ElementProperties().SetBg(Style.WindowBackground).SetFg(Style.WindowForeground)));
         Context.LastStackFrame.Cursor += new Vec2 { X = title.Length + 3, Y = 0 };
 

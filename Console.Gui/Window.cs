@@ -9,6 +9,7 @@ public class Window
 {
     public required string Id { get; set; }
     public List<DrawCommand> DrawCommands { get; set; } = new List<DrawCommand>();
+    public bool Modal { get; set; } = false;
 
     public LinkedList<StackFrame> Stack { get; set; } = new();
     public StackFrame LastStackFrame => Stack.Last();

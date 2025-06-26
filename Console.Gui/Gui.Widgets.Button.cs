@@ -26,8 +26,8 @@ public static partial class Gui
         else
             SetNextBackgroundColorDefault(Style.ButtonCenter);
 
-        SetNextForegroundColor(Style.ButtonText);
-        SetNextTextColor(Style.ButtonText);
+        SetNextForegroundColorDefault(Style.ButtonText);
+        SetNextTextColorDefault(Style.ButtonText);
 
         Context.PushId(text);
 
@@ -43,7 +43,7 @@ public static partial class Gui
         if (big)
         {
             Context.AddDrawCommand(new DrawBorderCommand(sf.ScreenPos + sf.Cursor, Context.LastStackFrame.Size, DrawBorderCommand.BorderType.Round));
-            Context.AddDrawCommand(new DrawTextCommand(text, sf.ScreenPos + sf.Cursor + new Vec2 { X = (Context.LastStackFrame.Size.X - text.Length)/2, Y = 1 }, new ElementProperties().SetBg(sf.BackgroundColor.Value).SetFg(Style.ButtonText)));
+            Context.AddDrawCommand(new DrawTextCommand(text, sf.ScreenPos + sf.Cursor + new Vec2 { X = (Context.LastStackFrame.Size.X - text.Length)/2, Y = 1 }, new ElementProperties().SetBg(sf.BackgroundColor.Value).SetFg(sf.TextColor.Value)));
         }
         else
         {

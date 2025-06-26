@@ -22,6 +22,7 @@ public class FrameBuffer
     public int Width { get; set; }
     public int Height { get; set; }
     public Element[,] Elements { get; set; }
+    public bool Darken { get; set; } = false;
 
     public Element this[int x, int y]
     {
@@ -34,6 +35,13 @@ public class FrameBuffer
 
     public void Write(string? id, string text, ElementProperties properties)
     {
+        if (Darken && properties.FgColor.HasValue)
+            properties.FgColor = properties.FgColor.Value.Darker(0.2f);
+        if (Darken && properties.BgColor.HasValue)
+            properties.BgColor = properties.BgColor.Value.Darker(0.2f);
+        if (Darken)
+            id = null;
+
         var firstPos = Cursor;
         for (int i = 0; i < text.Length; i++)
         {
