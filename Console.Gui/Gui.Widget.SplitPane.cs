@@ -25,6 +25,7 @@ public static partial class Gui
         Context.LastStackFrame.Size = sp.Size - new Vec2 { X = 0, Y = 0 };
         var state = Context.GetComponentState<SplitPaneState>(Context.CurrentId);
         state.SplitSizes.Clear();
+        state.Horizontal = horizontal;
 
         NextSplit(size);
 
@@ -45,22 +46,38 @@ public static partial class Gui
             size = tabPane.Size.X - state.SplitSizes.Sum(); // Default size is the remaining space
 
         Context.PushId("Split#" + state.SplitSizes.Count);
-        Context.LastStackFrame.ScreenPos = tabPane.ScreenPos! + new Vec2 { X = 1 + state.SplitSizes.Sum() + state.SplitSizes.Count(), Y = 0 };
-        Context.LastStackFrame.Size = new Vec2 { X = size, Y = tabPane.Size.Y - 2 };
+        if (state.Horizontal)
+        {
+            Context.LastStackFrame.ScreenPos = tabPane.ScreenPos! + new Vec2 { X = 1 + state.SplitSizes.Sum() + state.SplitSizes.Count(), Y = 0 };
+            Context.LastStackFrame.Size = new Vec2 { X = size, Y = tabPane.Size.Y - 2 };
+        }
+        else
+        {
+            Context.LastStackFrame.ScreenPos = tabPane.ScreenPos! + new Vec2 { X = 0, Y = 1 + state.SplitSizes.Sum() + state.SplitSizes.Count() };
+            Context.LastStackFrame.Size = new Vec2 { X = size, Y = tabPane.Size.Y - 2 };
+        }
         Context.LastStackFrame.Cursor = Vec2.Zero;
         Context.LastStackFrame.HasBorder = tabPane.HasBorder!.Value | BorderDir.RightDouble; //TODO
         state.SplitSizes.Add(size);
 
-        if (Context.LastStackFrame.ScreenPos.X + size < tabPane.ScreenPos!.X + tabPane.Size.X)
+        if (state.Horizontal)
         {
-            for (int ii = 0; ii < tabPane.Size.Y-1; ii++)
-                Context.AddDrawCommand(new DrawTextCommand("║", Context.LastStackFrame.ScreenPos + new Vec2 { X = size, Y = ii }, new ElementProperties().SetFg(Style.WindowForeground)));
+            if (Context.LastStackFrame.ScreenPos.X + size < tabPane.ScreenPos!.X + tabPane.Size.X)
+            {
+                for (int ii = 0; ii < tabPane.Size.Y - 1; ii++)
+                    Context.AddDrawCommand(new DrawTextCommand("║", Context.LastStackFrame.ScreenPos + new Vec2 { X = size, Y = ii }, new ElementProperties().SetFg(Style.WindowForeground)));
 
-            if (tabPane.HasBorder.Value.HasFlag(BorderDir.Up))
-                Context.AddDrawCommand(new DrawTextCommand("╦", Context.LastStackFrame.ScreenPos + new Vec2 { X = size, Y = -1 }, new ElementProperties().SetFg(Style.WindowForeground)));
+                if (tabPane.HasBorder.Value.HasFlag(BorderDir.Up))
+                    Context.AddDrawCommand(new DrawTextCommand("╦", Context.LastStackFrame.ScreenPos + new Vec2 { X = size, Y = -1 }, new ElementProperties().SetFg(Style.WindowForeground)));
 
-            if (tabPane.HasBorder.Value.HasFlag(BorderDir.Down))
-                Context.AddDrawCommand(new DrawTextCommand("╩", Context.LastStackFrame.ScreenPos + new Vec2 { X = size, Y = tabPane.Size.Y }, new ElementProperties().SetFg(Style.WindowForeground)));
+                if (tabPane.HasBorder.Value.HasFlag(BorderDir.Down))
+                    Context.AddDrawCommand(new DrawTextCommand("╩", Context.LastStackFrame.ScreenPos + new Vec2 { X = size, Y = tabPane.Size.Y }, new ElementProperties().SetFg(Style.WindowForeground)));
+            }
+        }
+        else
+        {
+            for (int ii = 0; ii < tabPane.Size.X - 1; ii++)
+                Context.AddDrawCommand(new DrawTextCommand("═", Context.LastStackFrame.ScreenPos + new Vec2 { X = ii, Y = size }, new ElementProperties().SetFg(Style.WindowForeground)));
         }
     }
 

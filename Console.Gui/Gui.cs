@@ -196,8 +196,12 @@ public static partial class Gui
 
         if (OperatingSystem.IsWindows())
         {
-            Console.BufferHeight = Console.WindowHeight;
-            Console.BufferWidth = Console.WindowWidth;
+            try
+            {
+                Console.BufferHeight = Console.WindowHeight;
+                Console.BufferWidth = Console.WindowWidth;
+            }
+            catch (Exception) { }
         }
     }
 

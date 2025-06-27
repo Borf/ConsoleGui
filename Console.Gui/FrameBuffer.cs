@@ -47,7 +47,7 @@ public class FrameBuffer
         {
             if (text[i] != '\n')
             {
-                if (Cursor.X < Width && Cursor.Y < Height)
+                if (Cursor.X < Width && Cursor.Y < Height && Cursor.X >= 0 && Cursor.Y >= 0)
                 {
                     var el = Elements[Cursor.X, Cursor.Y];
                     if (!NoOverrideSelf || (!el.ObjectId.StartsWith(id??string.Empty) && !(id??string.Empty).StartsWith(el.ObjectId)))
