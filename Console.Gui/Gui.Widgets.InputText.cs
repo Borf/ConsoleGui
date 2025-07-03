@@ -219,7 +219,7 @@ public static partial class Gui
         returnValue |= Gui.InputText(title, true, ref value);
         Gui.SameLine(1);
         Gui.SetNextWidth(buttonText.Length+4);
-        returnValue |= Gui.Button("Create", true);
+        returnValue |= Gui.Button(buttonText, true);
         return returnValue;
     }
 
