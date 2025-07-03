@@ -161,6 +161,12 @@ public static partial class Gui
             Context.KeyButtonInput.Add((KeyModifier.None, Key.Tab));
             result = result.Replace("\t", "");
         }
+        if (result.Contains('\n') || result.Contains('\r'))
+        {
+            Context.KeyButtonInput.Add((KeyModifier.None, Key.Enter));
+            result = result.Replace("\r", "");
+            result = result.Replace("\n", "");
+        }
 
         if (!string.IsNullOrEmpty(result))
         {

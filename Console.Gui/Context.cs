@@ -102,7 +102,8 @@ public enum Key
     Delete,
     Home,
     End,
-    A
+    A,
+    Enter
 }
 
 [Flags]

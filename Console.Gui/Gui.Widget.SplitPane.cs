@@ -54,7 +54,7 @@ public static partial class Gui
         else
         {
             Context.LastStackFrame.ScreenPos = tabPane.ScreenPos! + new Vec2 { X = 0, Y = 1 + state.SplitSizes.Sum() + state.SplitSizes.Count() };
-            Context.LastStackFrame.Size = new Vec2 { X = size, Y = tabPane.Size.Y - 2 };
+            Context.LastStackFrame.Size = new Vec2 { X = tabPane.Size.X - 2, Y = size };
         }
         Context.LastStackFrame.Cursor = Vec2.Zero;
         Context.LastStackFrame.HasBorder = tabPane.HasBorder!.Value | BorderDir.RightDouble; //TODO
