@@ -41,11 +41,11 @@ public static partial class Gui
         SetNextBackgroundColorDefault(Style.CheckboxBackground);
         SetNextTextColorDefault(Style.CheckboxText);
         Context.PushId(label);
-
+        label = label.StripHash();
         var activationState = GetComponentActivationState();
 
         var sf = Context.CascadedStackFrame;
-        int width = Context.LastStackFrame.Size?.X ?? label.Length + 1;
+        int width = Context.LastStackFrame.Size?.X ?? label.Length + 3;
         Context.AddDrawCommand(new DrawTextCommand(value ? "▏×▕" : "▏ ▕", sf.ScreenPos + sf.Cursor, new ElementProperties().SetBg(sf.BackgroundColor.Value).SetFg(sf.TextColor.Value).SetOverLine().SetUnderLine()));
         Context.PopId();
 

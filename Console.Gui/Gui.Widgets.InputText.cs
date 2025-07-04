@@ -11,6 +11,13 @@ namespace ConGui;
 
 public static partial class Gui
 {
+    public static (string, bool) InputText(string label, bool big, string value)
+    {
+        bool ret = InputText(label, big, ref value);
+        return (value, ret);
+    }
+
+
     public static bool InputText(string label, bool big, ref string value)
     {
         if (!Context.NextFrameProperties.SameLine)
